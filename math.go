@@ -23,6 +23,7 @@ func MaxNotNaN(array ...float64) float64 {
 		if math.IsNaN(v) {
 			continue
 		}
+		// array[0] can be NaN
 		if math.IsNaN(res) || v > res {
 			res = v
 		}
@@ -51,6 +52,7 @@ func MinNotNaN(array ...float64) float64 {
 		if math.IsNaN(v) {
 			continue
 		}
+		// array[0] can be NaN
 		if math.IsNaN(res) || v < res {
 			res = v
 		}
@@ -99,4 +101,12 @@ func SumNotNaN(array ...float64) float64 {
 		res += v
 	}
 	return res
+}
+
+// Abs returns the absolute value of x.
+func Abs[T Int | Float](x T) T {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

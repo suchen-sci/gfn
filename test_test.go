@@ -28,7 +28,7 @@ func AssertEqual[T comparable](t *testing.T, expected T, actual T, tags ...strin
 
 func AssertFloatEqual[T Float](t *testing.T, expected T, actual T, tags ...string) {
 	t.Helper()
-	if math.Abs(float64(expected-actual)) > 0.001 {
+	if math.Abs(float64(expected-actual)) > 0.0001 {
 		fail(t, fmt.Sprintf("expected: %v, actual: %v", expected, actual), tags...)
 	}
 }

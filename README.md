@@ -9,6 +9,7 @@
   - [gfn.Filter](#gfnfilter)
 - [Map](#map)
 - [Math](#math)
+  - [gfn.Abs](#gfnabs)
   - [gfn.Max](#gfnmax)
   - [gfn.MaxNotNaN](#gfnmaxnotnan)
   - [gfn.Min](#gfnmin)
@@ -75,6 +76,19 @@ gfn.Filter([]int{1, 2, 3, 4, 5, 6}, func(i int) bool {
 
 ## Math
 
+### gfn.Abs
+
+```go
+func Abs[T Int | Float](x T) T
+```
+
+Abs returns the absolute value of x.
+
+```go
+gfn.Abs(-1)      // 1
+gfn.Abs(-100.99) // 100.99
+```
+
 ### gfn.Max
 
 ```go
@@ -99,8 +113,8 @@ func MaxNotNaN(array ...float64) float64
 MaxNotNaN returns the maximum not NaN value in the array.
 
 ```go
-MaxNotNaN(1., 2., 3., math.NaN())              // 3.
-MaxNotNaN(math.NaN(), math.NaN(), math.NaN())  // all NaN, return NaN
+gfn.MaxNotNaN(1., 2., 3., math.NaN())              // 3.
+gfn.MaxNotNaN(math.NaN(), math.NaN(), math.NaN())  // all NaN, return NaN
 ```
 
 ### gfn.Min

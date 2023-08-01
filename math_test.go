@@ -128,3 +128,14 @@ func TestSumNotNaN(t *testing.T) {
 		SumNotNaN([]float64{}...)
 	})
 }
+
+func TestAbs(t *testing.T) {
+	AssertEqual(t, 1., Abs(1.))
+	AssertEqual(t, 1., Abs(-1.))
+	AssertEqual(t, math.Inf(1), Abs(math.Inf(1)))
+	AssertEqual(t, math.Inf(1), Abs(math.Inf(-1)))
+	AssertTrue(t, math.IsNaN(Abs(math.NaN())))
+
+	AssertEqual(t, 1, Abs(1))
+	AssertEqual(t, int64(100), Abs(int64(-100)))
+}
