@@ -8,3 +8,15 @@ func Map[T any, R any](array []T, mapper func(T) R) []R {
 	}
 	return result
 }
+
+// Filter returns a new array containing elements of the original array
+// that satisfy the provided function.
+func Filter[T any](array []T, filter func(T) bool) []T {
+	result := make([]T, 0)
+	for _, v := range array {
+		if filter(v) {
+			result = append(result, v)
+		}
+	}
+	return result
+}
