@@ -3,19 +3,23 @@
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Type](#type)
 - [Array](#array)
   - [gfn.Contains](#gfncontains)
+  - [gfn.Range](#gfnrange)
+  - [gfn.RangeBy](#gfnrangeby)
   - [gfn.Map](#gfnmap)
   - [gfn.Filter](#gfnfilter)
 - [Map](#map)
 - [Math](#math)
   - [gfn.Abs](#gfnabs)
   - [gfn.Max](#gfnmax)
-  - [gfn.MaxNotNaN](#gfnmaxnotnan)
+  - [gfn.MaxFloat64](#gfnmaxfloat64)
   - [gfn.Min](#gfnmin)
-  - [gfn.MinNotNaN](#gfnminnotnan)
+  - [gfn.MinFloat64](#gfnminfloat64)
   - [gfn.Sum](#gfnsum)
-  - [gfn.SumNotNaN](#gfnsumnotnan)
+  - [gfn.SumFloat64](#gfnsumfloat64)
+
 
 ## Installation
 ```
@@ -25,6 +29,25 @@ go get github.com/suchen-sci/gfn
 ## Usage 
 ```
 import "github.com/suchen-sci/gfn"
+```
+
+## Type
+```go
+type Int interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64
+}
+
+type Uint interface {
+	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+}
+
+type Float interface {
+	~float32 | ~float64
+}
+
+type Complex interface {
+	~complex64 | ~complex128
+}
 ```
 
 ## Array
@@ -40,6 +63,34 @@ Contains returns true if the array contains the value.
 ```go
 gfn.Contains([]int{1, 2, 3}, 2)               // true
 gfn.Contains([]string{"a", "b", "c"}, "b")    // true
+```
+
+### gfn.Range
+
+```go
+func Range[T Int | Uint](start, end, step T) []T 
+```
+
+Range function returns a sequence of numbers, starting from start, and increments by 1, until end is reached (not included).
+
+```go
+gfn.Range(0, 7)   // []int{0, 1, 2, 3, 4, 5, 6}
+gfn.Range(3, 8)   // []int{3, 4, 3, 6, 7}
+gfn.Range(-10, -5) // []int{-10, -9, -8, -7, -6}
+```
+
+### gfn.RangeBy
+
+```go
+func RangeBy[T Int | Uint](start, end, step T) []T 
+```
+
+RangeBy function returns a sequence of numbers, starting from start, and increments/decrements by step, until end is reached. Zero step panics (not included).
+
+```go
+gfn.RangeBy(0, 7, 1)   // []int{0, 1, 2, 3, 4, 5, 6}
+gfn.RangeBy(0, 8, 2)   // []int{0, 2, 4, 6}
+gfn.RangeBy(10, 0, -2) // []int{10, 8, 6, 4, 2}
 ```
 
 ### gfn.Map
@@ -92,56 +143,58 @@ gfn.Abs(-100.99) // 100.99
 ### gfn.Max
 
 ```go
-func Max[T Int | Uint | Float | ~string](array ...T) T
+func Max[T Int | Uint | ~float32 | ~string](array ...T) T
 ```
 
-Max returns the maximum value in the array.
+Max returns the maximum value in the array. 
 
-> Be careful when using this function for float64 arrays with NaN values. NaN values is not comparable to other float64. NaN > x is false. NaN < x is false. Which means `Max([math.NaN(), 0.5])` is `math.NaN()`, but `Max([0.5, math.NaN()])` is `0.5`.
+> For float64 arrays, please use MaxFloat64. More details in comments of Max
 
 ```go
 gfn.Max([]int16{1, 5, 9, 10}...)  // 10
 gfn.Max("ab", "cd", "e")          // "e"
 ```
 
-### gfn.MaxNotNaN
+### gfn.MaxFloat64
 
 ```go
-func MaxNotNaN(array ...float64) float64
+func MaxFloat64(skipNaN bool, array ...float64) float64
 ```
 
-MaxNotNaN returns the maximum not NaN value in the array.
+MaxFloat64 returns the maximum value in the array.
 
 ```go
-gfn.MaxNotNaN(1., 2., 3., math.NaN())              // 3.
-gfn.MaxNotNaN(math.NaN(), math.NaN(), math.NaN())  // all NaN, return NaN
+gfn.MaxFloat64(false, 1.1, math.NaN())                   // NaN
+gfn.MaxFloat64(true, 1.1, math.NaN(), 2.2)               // 2.2
+gfn.MaxFloat64(true, []float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
 ```
 
 ### gfn.Min
 
 ```go
-func Min[T Int | Uint | Float | ~string](array ...T) T
+func Min[T Int | Uint | ~float32 | ~string](array ...T) T
 ```
 
 Min returns the minimum value in the array.
-> Be careful when using this function for float64 arrays with NaN values. NaN values is not comparable to other float64. NaN > x is false. NaN < x is false. Which means `Min([math.NaN(), 0.5])` is `math.NaN()`, but `Min([0.5, math.NaN()])` is `0.5`.
+
+> For float64 arrays, please use MinFloat64.
 
 ```go
 gfn.Min(1.1, 2.2, 3.3)            // 1.1
 gfn.Min([]int16{1, 5, 9, 10}...)  // 1
 ```
 
-### gfn.MinNotNaN
+### gfn.MinFloat64
 
 ```go
-func MinNotNaN(array ...float64) float64
+func MinFloat64(skipNaN bool, array ...float64) float64
 ```
 
-MinNotNaN returns the minimum not NaN value in the array.
+MinFloat64 returns the minimum value in the array.
 
 ```go
-gfn.MinNotNaN(math.NaN(), 1., 2., 3.)             // 1. 
-gfn.MinNotNaN(math.NaN(), math.NaN(), math.NaN()) // all NaN, return NaN
+gfn.MinFloat64(false, math.NaN(), 1., 2., 3.)                  // NaN 
+gfn.MinFloat64(true, []float64{1.1, math.Inf(-1), math.NaN()}) // math.Inf(-1)
 ```
 
 ### gfn.Sum
@@ -151,7 +204,8 @@ func Sum[T Int | Uint | Float | ~string | Complex](array ...T) T
 ```
 
 Sum returns the sum of all values in the array.
-> Be careful when using this function for float64 arrays with NaN and Inf values. NaN values is not comparable to other float64. NaN + x is NaN. Which means `Sum([math.NaN(), 0.5])` is `math.NaN()`. `Sum(math.Inf(1), math.Inf(-1))` is `math.NaN()` too.
+
+> Be careful when using this function for float64 arrays with NaN and Inf values. `Sum([math.NaN(), 0.5])` produces `math.NaN()`. `Sum(math.Inf(1), math.Inf(-1))` produces `math.NaN()` too.
 
 ```go
 gfn.Sum([]int{1, 5, 9, 10}...)  // 25
@@ -159,16 +213,16 @@ gfn.Sum(1.1, 2.2, 3.3)          // 6.6
 gfn.Sum("ab", "cd", "e")        // "abcde"
 ```
 
-### gfn.SumNotNaN
+### gfn.SumFloat64
 
 ```go
-func SumNotNaN(array ...float64) float64
+func SumFloat64(skipNaN bool, array ...float64) float64 
 ```
 
-SumNotNaN returns the sum not NaN values in the array.
+SumFloat64 returns the sum of all values in the array.
 
 ```go
-gfn.SumNotNaN(1.1, 2.2, 3.3, math.NaN())          // 6.6
-gfn.SumNotNaN(math.NaN(), math.NaN(), math.NaN()) // all NaN, return NaN
-gfn.SumNotNaN(math.Inf(1), math.Inf(-1))          // Inf(1) + Inf(-1), return NaN
+gfn.SumFloat64(false, 1.1, 2.2, 3.3, math.NaN())         // NaN
+gfn.SumFloat64(true, 1.1, 2.2, 3.3, math.NaN())          // 6.6
+gfn.SumFloat64(true, math.Inf(1), math.Inf(-1))          // Inf(1) + Inf(-1), return NaN
 ```
