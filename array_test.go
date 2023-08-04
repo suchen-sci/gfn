@@ -1,6 +1,7 @@
 package gfn_test
 
 import (
+	"math/rand"
 	"sort"
 	"strconv"
 	"testing"
@@ -118,4 +119,40 @@ func TestToSet(t *testing.T) {
 
 	expected := map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
 	AssertTrue(t, Same(expected, set))
+}
+
+func TestIsSortedBy(t *testing.T) {
+	AssertTrue(t, IsSortedBy([]int{}, func(a, b int) bool { return a < b }))
+	AssertTrue(t, IsSortedBy([]int{1, 2, 3, 4, 5, 6, 7}, func(a, b int) bool { return a <= b }))
+	AssertTrue(t, IsSortedBy([]int{1, 1, 1, 2, 2, 2, 2}, func(a, b int) bool { return a <= b }))
+	AssertTrue(t, IsSortedBy([]int{2, 2, 2, 1, 1, 1, -1, -1}, func(a, b int) bool { return a >= b }))
+
+	AssertFalse(t, IsSortedBy([]int{1, 2, 10, 4, 5, 6, 7}, func(a, b int) bool { return a <= b }))
+	AssertFalse(t, IsSortedBy([]int{1, 1, 1, 100, 2, 2, 2}, func(a, b int) bool { return a <= b }))
+	AssertFalse(t, IsSortedBy([]int{2, 2, -10, 1, 1, 1, -1, -1}, func(a, b int) bool { return a >= b }))
+}
+
+func TestDistribution(t *testing.T) {
+	// check empty array
+	AssertTrue(t, Same(map[int]int{}, Distribution([]int{})))
+
+	// check array with many elements
+	{
+		array := make([]int, 100000)
+		for i := 0; i < 100000; i++ {
+			array[i] = i
+		}
+		rand.Shuffle(len(array), func(i, j int) {
+			array[i], array[j] = array[j], array[i]
+		})
+		distr := Distribution(array)
+		for i := 0; i < 100000; i++ {
+			AssertEqual(t, 1, distr[i])
+		}
+	}
+
+	// check distribution
+	AssertTrue(t, Same(map[int]int{1: 1, 2: 1, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4})))
+	AssertTrue(t, Same(map[int]int{1: 1, 2: 2, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4, 2})))
+	AssertTrue(t, Same(map[int]int{1: 1, 2: 4}, Distribution([]int{1, 2, 2, 2, 2})))
 }

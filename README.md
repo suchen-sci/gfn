@@ -11,6 +11,8 @@
   - [gfn.Shuffle](#gfnshuffle)
   - [gfn.Equal](#gfnequal)
   - [gfn.ToSet](#gfntoset)
+  - [gfn.IsSortedBy](#gfnissortedby)
+  - [gfn.Distribution](#gfndistribution)
 - [Functional](#functional)
   - [gfn.Map](#gfnmap)
   - [gfn.Filter](#gfnfilter)
@@ -25,8 +27,6 @@
   - [gfn.Sum](#gfnsum)
   - [gfn.DivMod](#gfndivmod)
   - [gfn.IsSorted](#gfnissorted)
-  - [gfn.IsSortedBy](#gfnissortedby)
-  - [gfn.Distribution](#gfndistribution)
 
 
 ## Installation
@@ -148,6 +148,32 @@ ToSet converts an array to a set.
 ```go
 gfn.ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
 // map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
+```
+
+### gfn.IsSortedBy
+
+```go
+func IsSortedBy[T any](array []T, order func(a1, a2 T) bool) bool
+```
+
+IsSortedBy returns true if the array is sorted in the given order. The order function should return true if a1 is ok to be placed before a2.
+
+```go
+IsSortedBy([]int{2, 2, 2, 1, 1, 1, -1, -1}, func(a, b int) bool { 
+    return a >= b 
+})  // true
+```
+
+### gfn.Distribution
+
+```go
+func Distribution[T comparable](array []T) map[T]int
+```
+
+Distribution returns a map of values and their counts.
+
+```go
+Distribution([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
 ```
 
 ## Functional
@@ -307,31 +333,4 @@ IsSorted returns true if the array is sorted in ascending order.
 
 ```go
 gfn.IsSorted([]int{1, 2, 3, 4})  // true
-```
-
-
-### gfn.IsSortedBy
-
-```go
-func IsSortedBy[T any](array []T, order func(a1, a2 T) bool) bool
-```
-
-IsSortedBy returns true if the array is sorted in the given order. The order function should return true if a1 is ok to be placed before a2.
-
-```go
-IsSortedBy([]int{2, 2, 2, 1, 1, 1, -1, -1}, func(a, b int) bool { 
-    return a >= b 
-})  // true
-```
-
-### gfn.Distribution
-
-```go
-func Distribution[T comparable](array []T) map[T]int
-```
-
-Distribution returns a map of values and their counts.
-
-```go
-Distribution([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
 ```

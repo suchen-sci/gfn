@@ -114,23 +114,3 @@ func IsSorted[T Int | Uint | Float | ~string](array []T) bool {
 	}
 	return true
 }
-
-// IsSortedBy returns true if the array is sorted in the given order.
-// The order function should return true if a1 is ok to be placed before a2.
-func IsSortedBy[T any](array []T, order func(a1, a2 T) bool) bool {
-	for i := 0; i < len(array)-1; i++ {
-		if !order(array[i], array[i+1]) {
-			return false
-		}
-	}
-	return true
-}
-
-// Distribution returns a map of values and their counts.
-func Distribution[T comparable](array []T) map[T]int {
-	res := make(map[T]int)
-	for _, v := range array {
-		res[v]++
-	}
-	return res
-}
