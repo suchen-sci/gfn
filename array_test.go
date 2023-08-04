@@ -1,7 +1,10 @@
 package gfn_test
 
 import (
+	"sort"
+	"strconv"
 	"testing"
+	"time"
 
 	. "github.com/suchen-sci/gfn"
 )
@@ -29,6 +32,9 @@ func TestContains(t *testing.T) {
 	dataB := &data{data: 1}
 	AssertTrue(t, Contains([]*data{dataA, dataB}, dataA))
 	AssertFalse(t, Contains([]*data{dataA, dataB}, &data{data: 1}))
+
+	AssertTrue(t, Contains([]time.Duration{time.Second, 2 * time.Second}, time.Second))
+	AssertFalse(t, Contains([]time.Duration{time.Second, 2 * time.Second}, 3*time.Second))
 }
 
 func TestRange(t *testing.T) {
@@ -74,4 +80,42 @@ func TestRangeBy(t *testing.T) {
 	AssertPanics(t, func() {
 		RangeBy(0, 10, 0)
 	})
+}
+
+func TestShuffle(t *testing.T) {
+	array := Range(0, 200000)
+	Shuffle(array)
+	AssertFalse(t, IsSorted(array))
+	AssertFalse(t, Equal(Range(0, 200000), array))
+
+	sort.Ints(array)
+	AssertTrue(t, IsSorted(array))
+	AssertSliceEqual(t, Range(0, 200000), array)
+}
+
+func TestEqual(t *testing.T) {
+	AssertTrue(t, Equal([]int{1, 2, 3}, []int{1, 2, 3}))
+	AssertFalse(t, Equal([]int{1, 3, 2}, []int{1, 2, 3}))
+
+	AssertTrue(t, Equal([]string{"a", "b", "c"}, []string{"a", "b", "c"}))
+	AssertFalse(t, Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"}))
+}
+
+func TestToSet(t *testing.T) {
+	set := ToSet([]int{0, 1, 2, 3, 4, 5})
+	AssertEqual(t, 6, len(set))
+	for i := 0; i < 6; i++ {
+		_, ok := set[i]
+		AssertTrue(t, ok, strconv.Itoa(i))
+	}
+
+	set = ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
+	AssertEqual(t, 6, len(set))
+	for i := 0; i < 6; i++ {
+		_, ok := set[i]
+		AssertTrue(t, ok, strconv.Itoa(i))
+	}
+
+	expected := map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
+	AssertTrue(t, Same(expected, set))
 }

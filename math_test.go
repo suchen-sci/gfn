@@ -1,6 +1,7 @@
 package gfn_test
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
@@ -53,24 +54,16 @@ func TestMax(t *testing.T) {
 }
 
 func TestMaxFloat64(t *testing.T) {
-	// ignoreNaN = false
-	AssertTrue(t, math.IsNaN(MaxFloat64(false, math.NaN(), 1.5, 2)))
-	AssertTrue(t, math.IsNaN(MaxFloat64(false, 1.3, -1, math.NaN(), 1, 2)))
-	AssertTrue(t, math.IsNaN(MaxFloat64(false, 1.2, -1, math.NaN(), 1, math.Inf(1))))
-	AssertEqual(t, math.Inf(1), MaxFloat64(false, 1.8, -1, 1, math.Inf(1)))
-	AssertEqual(t, 1.9, MaxFloat64(false, 1, -1, 1.9))
-
-	// ignoreNaN = true
-	AssertEqual(t, 2.2, MaxFloat64(true, math.NaN(), 1, 2.2))
-	AssertEqual(t, 2.8, MaxFloat64(true, 1, -1, math.NaN(), 1, 2.8))
-	AssertEqual(t, math.Inf(1), MaxFloat64(true, 1, -1, math.NaN(), 1, math.Inf(1)))
-	AssertEqual(t, math.Inf(1), MaxFloat64(true, 1, -1, 1, math.Inf(1)))
-	AssertEqual(t, 1.9, MaxFloat64(true, 1.9, -1, 1))
-	AssertTrue(t, math.IsNaN(MaxFloat64(true, math.NaN(), math.NaN(), math.NaN())))
+	AssertEqual(t, 2.2, MaxFloat64(math.NaN(), 1, 2.2))
+	AssertEqual(t, 2.8, MaxFloat64(1, -1, math.NaN(), 1, 2.8))
+	AssertEqual(t, math.Inf(1), MaxFloat64(1, -1, math.NaN(), 1, math.Inf(1)))
+	AssertEqual(t, math.Inf(1), MaxFloat64(1, -1, 1, math.Inf(1)))
+	AssertEqual(t, 1.9, MaxFloat64(1.9, -1, 1))
+	AssertTrue(t, math.IsNaN(MaxFloat64(math.NaN(), math.NaN(), math.NaN())))
 
 	// check empty array
 	AssertPanics(t, func() {
-		MaxFloat64(true)
+		MaxFloat64()
 	})
 
 	// check array with many elements
@@ -82,7 +75,7 @@ func TestMaxFloat64(t *testing.T) {
 		rand.Shuffle(len(array), func(i, j int) {
 			array[i], array[j] = array[j], array[i]
 		})
-		AssertEqual(t, float64(99999), MaxFloat64(true, array...))
+		AssertEqual(t, float64(99999), MaxFloat64(array...))
 	}
 }
 
@@ -131,24 +124,16 @@ func TestMin(t *testing.T) {
 }
 
 func TestMinFloat64(t *testing.T) {
-	// ignoreNaN = false
-	AssertTrue(t, math.IsNaN(MinFloat64(false, math.NaN(), 1.5, 2)))
-	AssertTrue(t, math.IsNaN(MinFloat64(false, 1.3, -1, math.NaN(), 1, 2)))
-	AssertTrue(t, math.IsNaN(MinFloat64(false, 1.2, -1, math.NaN(), 1, math.Inf(1))))
-	AssertEqual(t, -1, MinFloat64(false, 1.8, -1, 1, math.Inf(1)))
-	AssertEqual(t, -1, MinFloat64(false, 1, -1, 1.9))
-
-	// ignoreNaN = true
-	AssertEqual(t, 1.85, MinFloat64(true, math.NaN(), 1.85, 2.2))
-	AssertEqual(t, -1, MinFloat64(true, 1, -1, math.NaN(), 1, 2.8))
-	AssertEqual(t, math.Inf(-1), MinFloat64(true, 1, -1, math.NaN(), 1, math.Inf(-1)))
-	AssertEqual(t, -1, MinFloat64(true, 1, -1, 1, math.Inf(1)))
-	AssertEqual(t, -1, MinFloat64(true, 1.9, -1, 1))
-	AssertTrue(t, math.IsNaN(MinFloat64(true, math.NaN(), math.NaN(), math.NaN())))
+	AssertEqual(t, 1.85, MinFloat64(math.NaN(), 1.85, 2.2))
+	AssertEqual(t, -1, MinFloat64(1, -1, math.NaN(), 1, 2.8))
+	AssertEqual(t, math.Inf(-1), MinFloat64(1, -1, math.NaN(), 1, math.Inf(-1)))
+	AssertEqual(t, -1, MinFloat64(1, -1, 1, math.Inf(1)))
+	AssertEqual(t, -1, MinFloat64(1.9, -1, 1))
+	AssertTrue(t, math.IsNaN(MinFloat64(math.NaN(), math.NaN(), math.NaN())))
 
 	// check empty array
 	AssertPanics(t, func() {
-		MinFloat64(true)
+		MinFloat64()
 	})
 
 	// check array with many elements
@@ -160,7 +145,7 @@ func TestMinFloat64(t *testing.T) {
 		rand.Shuffle(len(array), func(i, j int) {
 			array[i], array[j] = array[j], array[i]
 		})
-		AssertEqual(t, float64(0), MinFloat64(true, array...))
+		AssertEqual(t, float64(0), MinFloat64(array...))
 	}
 }
 
@@ -220,47 +205,6 @@ func TestSum(t *testing.T) {
 	AssertTrue(t, math.IsNaN(Sum([]float64{math.Inf(1), math.Inf(-1), math.Inf(1)}...)))
 }
 
-func TestSumFloat64(t *testing.T) {
-	// ignoreNaN = false
-	AssertTrue(t, math.IsNaN(SumFloat64(false, math.NaN(), 1.5, 2, 3.89)))
-	AssertTrue(t, math.IsNaN(SumFloat64(false, 1.3, -1, math.NaN(), 1, 2)))
-	AssertTrue(t, math.IsNaN(SumFloat64(false, 1.2, -1, math.NaN(), 1, math.Inf(1))))
-	AssertTrue(t, math.IsNaN(SumFloat64(false, 1.2, -1, 1.9, math.NaN())))
-	AssertEqual(t, math.Inf(1), SumFloat64(false, 1.8, -1, 1, math.Inf(1)))
-	AssertEqual(t, math.Inf(-1), SumFloat64(false, math.Inf(-1), 100, 100000))
-	AssertFloatEqual(t, 100.1, SumFloat64(false, 1, -1, 100.1))
-
-	// ignoreNaN = true
-	AssertFloatEqual(t, 3.2, SumFloat64(true, math.NaN(), 1, 2.2, 0, -100, 100))
-	AssertFloatEqual(t, 3.8, SumFloat64(true, 1, -1, math.NaN(), 1, 2.8))
-	AssertEqual(t, math.Inf(1), SumFloat64(true, 1, -1, math.NaN(), 1, math.Inf(1)))
-	AssertFloatEqual(t, 0, SumFloat64(true, 1, -1, 100, -100, math.NaN()))
-	AssertEqual(t, math.Inf(-1), SumFloat64(true, 1, -1, 1, math.Inf(-1)))
-	AssertFloatEqual(t, 1.9, SumFloat64(true, 1.9, -1, 1))
-	AssertTrue(t, math.IsNaN(SumFloat64(true, math.NaN(), math.NaN(), math.NaN())))
-	AssertTrue(t, math.IsNaN(SumFloat64(true, math.Inf(1), math.Inf(-1), math.NaN())))
-	AssertTrue(t, math.IsNaN(SumFloat64(true, math.Inf(1), math.Inf(-1), 100, -100, 98.99)))
-
-	// check empty array
-	AssertPanics(t, func() {
-		SumFloat64(true)
-	})
-
-	// check array with many elements
-	{
-		array := make([]float64, 1000)
-		res := 0.
-		for i := 0; i < 1000; i++ {
-			array[i] = float64(i) / 39.
-			res += array[i]
-		}
-		rand.Shuffle(len(array), func(i, j int) {
-			array[i], array[j] = array[j], array[i]
-		})
-		AssertFloatEqual(t, res, SumFloat64(true, array...))
-	}
-}
-
 func TestAbs(t *testing.T) {
 	AssertEqual(t, 1., Abs(1.))
 	AssertEqual(t, 1., Abs(-1.))
@@ -273,4 +217,88 @@ func TestAbs(t *testing.T) {
 	AssertEqual(t, 1, Abs(1))
 	AssertEqual(t, int64(100), Abs(int64(-100)))
 	AssertEqual(t, int64(100), Abs(int64(100)))
+}
+
+func TestDivMod(t *testing.T) {
+	for i := 0; i < 1000; i++ {
+		a := rand.Intn(10000) + 1
+		b := rand.Intn(10000) + 1
+		if rand.Intn(1000) < 250 {
+			a = -a
+		}
+		if rand.Intn(1000) < 250 {
+			b = -b
+		}
+		div, mod := DivMod(a, b)
+		AssertEqual(t, a/b, div, fmt.Sprintf("%d/%d", a, b))
+		AssertEqual(t, a%b, mod, fmt.Sprintf("%d/%d", a, b))
+	}
+
+	testCases := []struct {
+		a, b, div, mod int
+	}{
+		{1, 1, 1, 0},
+		{1, 2, 0, 1},
+		{-10, 3, -3, -1},
+		{-11, 3, -3, -2},
+		{-12, 3, -4, 0},
+		{-13, 3, -4, -1},
+		{139, 3, 46, 1},
+	}
+
+	for _, tc := range testCases {
+		div, mod := DivMod(tc.a, tc.b)
+		AssertEqual(t, tc.div, div, fmt.Sprintf("%d/%d", tc.a, tc.b))
+		AssertEqual(t, tc.mod, mod, fmt.Sprintf("%d/%d", tc.a, tc.b))
+	}
+
+	AssertPanics(t, func() {
+		DivMod(1, 0)
+	})
+}
+
+func TestIsSorted(t *testing.T) {
+	AssertTrue(t, IsSorted([]int{}))
+	AssertTrue(t, IsSorted([]int{1, 2, 3}))
+	AssertTrue(t, IsSorted([]int{1, 1, 1, 1, 1, 1}))
+	AssertTrue(t, IsSorted([]int{1, 2, 2, 3, 3, 3}))
+
+	AssertFalse(t, IsSorted([]int{1, 23, 2}))
+	AssertFalse(t, IsSorted([]int{1, 23, 99, 1, 100, 2}))
+}
+
+func TestIsSortedBy(t *testing.T) {
+	AssertTrue(t, IsSortedBy([]int{}, func(a, b int) bool { return a < b }))
+	AssertTrue(t, IsSortedBy([]int{1, 2, 3, 4, 5, 6, 7}, func(a, b int) bool { return a <= b }))
+	AssertTrue(t, IsSortedBy([]int{1, 1, 1, 2, 2, 2, 2}, func(a, b int) bool { return a <= b }))
+	AssertTrue(t, IsSortedBy([]int{2, 2, 2, 1, 1, 1, -1, -1}, func(a, b int) bool { return a >= b }))
+
+	AssertFalse(t, IsSortedBy([]int{1, 2, 10, 4, 5, 6, 7}, func(a, b int) bool { return a <= b }))
+	AssertFalse(t, IsSortedBy([]int{1, 1, 1, 100, 2, 2, 2}, func(a, b int) bool { return a <= b }))
+	AssertFalse(t, IsSortedBy([]int{2, 2, -10, 1, 1, 1, -1, -1}, func(a, b int) bool { return a >= b }))
+}
+
+func TestDistribution(t *testing.T) {
+	// check empty array
+	AssertTrue(t, Same(map[int]int{}, Distribution([]int{})))
+
+	// check array with many elements
+	{
+		array := make([]int, 100000)
+		for i := 0; i < 100000; i++ {
+			array[i] = i
+		}
+		rand.Shuffle(len(array), func(i, j int) {
+			array[i], array[j] = array[j], array[i]
+		})
+		distr := Distribution(array)
+		for i := 0; i < 100000; i++ {
+			AssertEqual(t, 1, distr[i])
+		}
+	}
+
+	// check distribution
+	AssertTrue(t, Same(map[int]int{1: 1, 2: 1, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4})))
+	AssertTrue(t, Same(map[int]int{1: 1, 2: 2, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4, 2})))
+	AssertTrue(t, Same(map[int]int{1: 1, 2: 4}, Distribution([]int{1, 2, 2, 2, 2})))
 }

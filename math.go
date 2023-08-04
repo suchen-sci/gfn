@@ -1,11 +1,8 @@
 package gfn
 
 import (
-	"errors"
 	"math"
 )
-
-var ErrEmptyArray = errors.New("array is empty")
 
 // Max returns the maximum value in the array. For float64 arrays, please use MaxFloat64.
 // NaN value in float64 arrays is not comparable to other values.
@@ -14,7 +11,7 @@ var ErrEmptyArray = errors.New("array is empty")
 // this function does not support float64 arrays.
 func Max[T Int | Uint | ~float32 | ~string](array ...T) T {
 	if len(array) == 0 {
-		panic(ErrEmptyArray)
+		panic("array is empty")
 	}
 
 	res := array[0]
@@ -26,21 +23,16 @@ func Max[T Int | Uint | ~float32 | ~string](array ...T) T {
 	return res
 }
 
-// MaxFloat64 returns the maximum value in the array. NaN value is skipped if skipNaN is true.
-// If skipNaN is false, function returns NaN if NaN is present in the array.
-// Even if skipNaN is true, function returns NaN if all values are NaN.
-func MaxFloat64(skipNaN bool, array ...float64) float64 {
+// MaxFloat64 returns the maximum value in the array. NaN values are skipped.
+func MaxFloat64(array ...float64) float64 {
 	if len(array) == 0 {
-		panic(ErrEmptyArray)
+		panic("array is empty")
 	}
 
 	res := array[0]
 	for _, v := range array {
 		if math.IsNaN(v) {
-			if skipNaN {
-				continue
-			}
-			return math.NaN()
+			continue
 		}
 		if math.IsNaN(res) || v > res {
 			res = v
@@ -53,7 +45,7 @@ func MaxFloat64(skipNaN bool, array ...float64) float64 {
 // More details in Max.
 func Min[T Int | Uint | ~float32 | ~string](array ...T) T {
 	if len(array) == 0 {
-		panic(ErrEmptyArray)
+		panic("array is empty")
 	}
 
 	res := array[0]
@@ -65,20 +57,16 @@ func Min[T Int | Uint | ~float32 | ~string](array ...T) T {
 	return res
 }
 
-// MinFloat64 returns the minimum value in the array. NaN value is skipped if skipNaN is true.
-// More details in MaxFloat64.
-func MinFloat64(skipNaN bool, array ...float64) float64 {
+// MinFloat64 returns the minimum value in the array. NaN values are skipped.
+func MinFloat64(array ...float64) float64 {
 	if len(array) == 0 {
-		panic(ErrEmptyArray)
+		panic("array is empty")
 	}
 
 	res := array[0]
 	for _, v := range array {
 		if math.IsNaN(v) {
-			if skipNaN {
-				continue
-			}
-			return math.NaN()
+			continue
 		}
 		if math.IsNaN(res) || v < res {
 			res = v
@@ -92,7 +80,7 @@ func MinFloat64(skipNaN bool, array ...float64) float64 {
 // Sum([math.NaN(), 0.5]) produces math.NaN(). Sum(math.Inf(1), math.Inf(-1)) produces math.NaN() too.
 func Sum[T Int | Uint | Float | ~string | Complex](array ...T) T {
 	if len(array) == 0 {
-		panic(ErrEmptyArray)
+		panic("array is empty")
 	}
 
 	res := array[0]
@@ -104,44 +92,45 @@ func Sum[T Int | Uint | Float | ~string | Complex](array ...T) T {
 	return res
 }
 
-// SumFloat64 returns the sum of all values in the array. NaN value is skipped if skipNaN is true.
-// If skipNaN is false, function returns NaN if NaN is present in the array.
-// Even if skipNaN is true, function returns NaN if all values are NaN or SumFloat64(math.Inf(1), math.Inf(-1)).
-func SumFloat64(skipNaN bool, array ...float64) float64 {
-	if len(array) == 0 {
-		panic(ErrEmptyArray)
-	}
-
-	i := 0
-	for ; i < len(array); i++ {
-		if math.IsNaN(array[i]) {
-			if !skipNaN {
-				return math.NaN()
-			}
-		} else {
-			break
-		}
-	}
-	if i == len(array) {
-		return math.NaN()
-	}
-	res := array[i]
-	for _, v := range array[i+1:] {
-		if math.IsNaN(v) {
-			if skipNaN {
-				continue
-			}
-			return math.NaN()
-		}
-		res += v
-	}
-	return res
-}
-
 // Abs returns the absolute value of x.
 func Abs[T Int | Float](x T) T {
 	if x < 0 {
 		return -x
 	}
 	return x
+}
+
+// DivMod returns quotient and remainder of a/b.
+func DivMod[T Int | Uint](a, b T) (T, T) {
+	return a / b, a % b
+}
+
+// IsSorted returns true if the array is sorted in ascending order.
+func IsSorted[T Int | Uint | Float | ~string](array []T) bool {
+	for i := 0; i < len(array)-1; i++ {
+		if array[i] > array[i+1] {
+			return false
+		}
+	}
+	return true
+}
+
+// IsSortedBy returns true if the array is sorted in the given order.
+// The order function should return true if a1 is ok to be placed before a2.
+func IsSortedBy[T any](array []T, order func(a1, a2 T) bool) bool {
+	for i := 0; i < len(array)-1; i++ {
+		if !order(array[i], array[i+1]) {
+			return false
+		}
+	}
+	return true
+}
+
+// Distribution returns a map of values and their counts.
+func Distribution[T comparable](array []T) map[T]int {
+	res := make(map[T]int)
+	for _, v := range array {
+		res[v]++
+	}
+	return res
 }

@@ -1,6 +1,8 @@
 // gfn is a Golang library that leverages generics to provide various methods.
 package gfn
 
+import "math/rand"
+
 // Contains returns true if the array contains the value.
 func Contains[T comparable](array []T, value T) bool {
 	for _, v := range array {
@@ -48,4 +50,34 @@ func RangeBy[T Int | Uint](start, end, step T) []T {
 		return res
 	}
 	return []T{}
+}
+
+// Shuffle randomizes the order of elements by using Fisher–Yates algorithm
+func Shuffle[T any](array []T) {
+	for i := range array {
+		j := rand.Intn(i + 1)
+		array[i], array[j] = array[j], array[i]
+	}
+}
+
+// Equal returns true if two arrays are equal.
+func Equal[T comparable](a, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, aa := range a {
+		if aa != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// ToSet converts an array to a set.
+func ToSet[T comparable](array []T) map[T]struct{} {
+	res := make(map[T]struct{})
+	for _, v := range array {
+		res[v] = struct{}{}
+	}
+	return res
 }
