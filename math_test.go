@@ -256,13 +256,3 @@ func TestDivMod(t *testing.T) {
 		DivMod(1, 0)
 	})
 }
-
-func TestIsSorted(t *testing.T) {
-	AssertTrue(t, IsSorted([]int{}))
-	AssertTrue(t, IsSorted([]int{1, 2, 3}))
-	AssertTrue(t, IsSorted([]int{1, 1, 1, 1, 1, 1}))
-	AssertTrue(t, IsSorted([]int{1, 2, 2, 3, 3, 3}))
-
-	AssertFalse(t, IsSorted([]int{1, 23, 2}))
-	AssertFalse(t, IsSorted([]int{1, 23, 99, 1, 100, 2}))
-}

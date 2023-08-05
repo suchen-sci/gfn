@@ -15,10 +15,10 @@ func TestSame(t *testing.T) {
 			map1[i] = struct{}{}
 			map2[i] = struct{}{}
 		}
-		AssertTrue(t, Same(map1, map2))
+		AssertTrue(t, Compare(map1, map2))
 
 		map2[100] = struct{}{}
-		AssertFalse(t, Same(map1, map2))
+		AssertFalse(t, Compare(map1, map2))
 	}
 
 	{
@@ -28,9 +28,9 @@ func TestSame(t *testing.T) {
 			map1[i] = strconv.Itoa(i)
 			map2[i] = strconv.Itoa(i)
 		}
-		AssertTrue(t, Same(map1, map2))
+		AssertTrue(t, Compare(map1, map2))
 
 		map2[0] = "999"
-		AssertFalse(t, Same(map1, map2))
+		AssertFalse(t, Compare(map1, map2))
 	}
 }

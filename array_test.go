@@ -118,7 +118,7 @@ func TestToSet(t *testing.T) {
 	}
 
 	expected := map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
-	AssertTrue(t, Same(expected, set))
+	AssertTrue(t, Compare(expected, set))
 }
 
 func TestIsSortedBy(t *testing.T) {
@@ -134,7 +134,7 @@ func TestIsSortedBy(t *testing.T) {
 
 func TestDistribution(t *testing.T) {
 	// check empty array
-	AssertTrue(t, Same(map[int]int{}, Distribution([]int{})))
+	AssertTrue(t, Compare(map[int]int{}, Distribution([]int{})))
 
 	// check array with many elements
 	{
@@ -152,7 +152,17 @@ func TestDistribution(t *testing.T) {
 	}
 
 	// check distribution
-	AssertTrue(t, Same(map[int]int{1: 1, 2: 1, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4})))
-	AssertTrue(t, Same(map[int]int{1: 1, 2: 2, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4, 2})))
-	AssertTrue(t, Same(map[int]int{1: 1, 2: 4}, Distribution([]int{1, 2, 2, 2, 2})))
+	AssertTrue(t, Compare(map[int]int{1: 1, 2: 1, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4})))
+	AssertTrue(t, Compare(map[int]int{1: 1, 2: 2, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4, 2})))
+	AssertTrue(t, Compare(map[int]int{1: 1, 2: 4}, Distribution([]int{1, 2, 2, 2, 2})))
+}
+
+func TestIsSorted(t *testing.T) {
+	AssertTrue(t, IsSorted([]int{}))
+	AssertTrue(t, IsSorted([]int{1, 2, 3}))
+	AssertTrue(t, IsSorted([]int{1, 1, 1, 1, 1, 1}))
+	AssertTrue(t, IsSorted([]int{1, 2, 2, 3, 3, 3}))
+
+	AssertFalse(t, IsSorted([]int{1, 23, 2}))
+	AssertFalse(t, IsSorted([]int{1, 23, 99, 1, 100, 2}))
 }
