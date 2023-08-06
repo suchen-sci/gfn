@@ -140,3 +140,47 @@ func Distribution[T comparable](array []T) map[T]int {
 	}
 	return res
 }
+
+/* @example Zip
+gfn.Zip([]int{1, 2, 3}, []string{"a", "b", "c"})
+// []gfn.Pair[int, string]{
+// 	{First: 1, Second: "a"},
+// 	{First: 2, Second: "b"},
+// 	{First: 3, Second: "c"}
+// }
+*/
+
+// Zip returns a sequence of pairs built from the elements of two arrays.
+func Zip[T, U any](a []T, b []U) []Pair[T, U] {
+	l := Min(len(a), len(b))
+	res := make([]Pair[T, U], l)
+	for i := 0; i < l; i++ {
+		res[i] = Pair[T, U]{a[i], b[i]}
+	}
+	return res
+}
+
+/* @example Unzip
+pairs := []gfn.Pair[int, string]{
+	{First: 1, Second: "a"},
+	{First: 2, Second: "b"},
+	{First: 3, Second: "c"},
+}
+gfn.Unzip(len(pairs), func(i int) (int, string) {
+	return pairs[i].First, pairs[i].Second
+})
+// ([]int{1, 2, 3}, []string{"a", "b", "c"})
+*/
+
+// Unzip returns two arrays built from the elements of a sequence of pairs.
+func Unzip[T, U any](n int, unzipFn func(i int) (T, U)) ([]T, []U) {
+	if n < 0 {
+		panic("negative length")
+	}
+	a := make([]T, n)
+	b := make([]U, n)
+	for i := 0; i < n; i++ {
+		a[i], b[i] = unzipFn(i)
+	}
+	return a, b
+}

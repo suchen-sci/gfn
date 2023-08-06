@@ -16,6 +16,8 @@
   - [gfn.RangeBy](#gfnrangeby)
   - [gfn.Shuffle](#gfnshuffle)
   - [gfn.ToSet](#gfntoset)
+  - [gfn.Unzip](#gfnunzip)
+  - [gfn.Zip](#gfnzip)
 - [Functional](#functional)
   - [gfn.Filter](#gfnfilter)
   - [gfn.Map](#gfnmap)
@@ -66,6 +68,11 @@ type Float interface {
 
 type Complex interface {
     ~complex64 | ~complex128
+}
+
+type Pair[T, U any] struct {
+    First  T
+    Second U
 }
 ```
 
@@ -216,6 +223,49 @@ ToSet converts an array to a set.
 ```go
 gfn.ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
 // map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
+```
+
+
+
+### gfn.Unzip
+
+```go
+func Unzip[T, U any](n int, unzipFn func(i int) (T, U)) ([]T, []U) 
+```
+
+Unzip returns two arrays built from the elements of a sequence of pairs.
+
+
+```go
+pairs := []gfn.Pair[int, string]{
+    {First: 1, Second: "a"},
+    {First: 2, Second: "b"},
+    {First: 3, Second: "c"},
+}
+gfn.Unzip(len(pairs), func(i int) (int, string) {
+    return pairs[i].First, pairs[i].Second
+})
+// ([]int{1, 2, 3}, []string{"a", "b", "c"})
+```
+
+
+
+### gfn.Zip
+
+```go
+func Zip[T, U any](a []T, b []U) []Pair[T, U] 
+```
+
+Zip returns a sequence of pairs built from the elements of two arrays.
+
+
+```go
+gfn.Zip([]int{1, 2, 3}, []string{"a", "b", "c"})
+// []gfn.Pair[int, string]{
+//     {First: 1, Second: "a"},
+//     {First: 2, Second: "b"},
+//     {First: 3, Second: "c"}
+// }
 ```
 
 

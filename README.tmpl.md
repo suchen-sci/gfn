@@ -44,6 +44,11 @@ type Float interface {
 type Complex interface {
     ~complex64 | ~complex128
 }
+
+type Pair[T, U any] struct {
+    First  T
+    Second U
+}
 ```
 
 {{ CONTENT }}

@@ -27,3 +27,9 @@ type Float interface {
 type Complex interface {
 	~complex64 | ~complex128
 }
+
+// Pair is a generic pair of values.
+type Pair[T, U any] struct {
+	First  T
+	Second U
+}

@@ -166,3 +166,28 @@ func TestIsSorted(t *testing.T) {
 	AssertFalse(t, IsSorted([]int{1, 23, 2}))
 	AssertFalse(t, IsSorted([]int{1, 23, 99, 1, 100, 2}))
 }
+
+func TestZip(t *testing.T) {
+	AssertSliceEqual(t, []Pair[int, int]{}, Zip([]int{}, []int{}))
+	AssertSliceEqual(t, []Pair[int, string]{{1, "a"}, {2, "b"}, {3, "c"}}, Zip([]int{1, 2, 3}, []string{"a", "b", "c"}))
+	AssertSliceEqual(t, []Pair[int, string]{{1, "a"}, {2, "b"}}, Zip([]int{1, 2}, []string{"a", "b", "c"}))
+}
+
+func TestUnzip(t *testing.T) {
+	pairs := []Pair[int, string]{
+		{First: 1, Second: "a"},
+		{First: 2, Second: "b"},
+		{First: 3, Second: "c"},
+	}
+	a, b := Unzip(len(pairs), func(i int) (int, string) {
+		return pairs[i].First, pairs[i].Second
+	})
+	AssertSliceEqual(t, []int{1, 2, 3}, a)
+	AssertSliceEqual(t, []string{"a", "b", "c"}, b)
+
+	AssertPanics(t, func() {
+		Unzip(-1, func(i int) (int, string) {
+			return 0, ""
+		})
+	})
+}
