@@ -2,7 +2,7 @@ package gfn
 
 /* @example Map
 gfn.Map([]int{1, 2, 3}, func(i int) string {
-	return strconv.Itoa(i)
+    return strconv.Itoa(i)
 })
 // []string{"1", "2", "3"}
 */
