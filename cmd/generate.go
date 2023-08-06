@@ -9,16 +9,21 @@ import (
 	"text/template"
 )
 
-/* @example Name
-this is multiline example for Name.
+// format:
+// for multiline example:
+
+/* @example {function name}
+{multiline example code}
 */
 
+// function comments format:
 /*
-// Name is name.
+
+// {function name} is {function description}.
 // @example
-// Name(1)
-func Name(a int) int {
-	return a
+// {function name}({function args})
+func {function name} (args) {
+	{code}
 }
 */
 
