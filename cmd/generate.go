@@ -34,7 +34,7 @@ var categories = [][2]string{
 	{"Math", "math.go"},
 }
 
-const readmeTemplateFile = "README.TEMPLATE.md"
+const readmeTemplateFile = "README.tmpl.md"
 const readmeFile = "README.md"
 
 func main() {
