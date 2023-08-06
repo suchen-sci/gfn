@@ -9,6 +9,19 @@ import (
 	"text/template"
 )
 
+/* @example Name
+this is multiline example for Name.
+*/
+
+/*
+// Name is name.
+// @example
+// Name(1)
+func Name(a int) int {
+	return a
+}
+*/
+
 var categories = [][2]string{
 	{"Array", "array.go"},
 	{"Functional", "fp.go"},
