@@ -254,7 +254,7 @@ Map returns a new array with the results of calling the mapper function on each 
 
 ```go
 gfn.Map([]int{1, 2, 3}, func(i int) string {
-	return strconv.Itoa(i)
+    return strconv.Itoa(i)
 })
 // []string{"1", "2", "3"}
 
