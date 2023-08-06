@@ -1,9 +1,16 @@
 package gfn
 
+/* @example Map
+gfn.Map([]int{1, 2, 3}, func(i int) string {
+	return strconv.Itoa(i)
+})
+// []string{"1", "2", "3"}
+*/
+
 // Map returns a new array with the results of calling the mapper function on each element.
 // @example
-// gfn.Map([]int{1, 2, 3}, func(i int) string { return strconv.Itoa(i) })
-// // []string{"1", "2", "3"}
+// gfn.Map([]int{1, 2, 3}, func(i int) string { return i+1 })
+// // []int{2, 3, 4}
 func Map[T any, R any](array []T, mapper func(T) R) []R {
 	result := make([]R, len(array))
 	for i, v := range array {

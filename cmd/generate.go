@@ -6,7 +6,18 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"text/template"
 )
+
+var categories = [][2]string{
+	{"Array", "array.go"},
+	{"Functional", "fp.go"},
+	{"Map", "map.go"},
+	{"Math", "math.go"},
+}
+
+const readmeTemplateFile = "README.TEMPLATE.md"
+const readmeFile = "README.md"
 
 func main() {
 	wd := os.Getenv("GFNCWD")
@@ -20,145 +31,201 @@ func main() {
 	for i := 0; i < len(categories); i++ {
 		cat, err := processCategory(categories[i][0], filepath.Join(wd, categories[i][1]))
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("process category %s %s failed, %s", categories[i][0], categories[i][1], err.Error()))
 		}
-		toc += cat.TOC()
-		content += cat.Content()
+		toc += cat.toc()
+		content += cat.content()
 	}
 
-	readmeTemplate := filepath.Join(wd, "readme.template.md")
-	readme, err := os.ReadFile(readmeTemplate)
+	readmeTmpl, err := os.ReadFile(filepath.Join(wd, readmeTemplateFile))
 	if err != nil {
 		panic(err)
 	}
-	readmeStr := strings.Replace(string(readme), "{{ TOC }}", toc, 1)
-	readmeStr = strings.Replace(string(readmeStr), "{{ CONTENT }}", content, 1)
-	os.WriteFile(filepath.Join(wd, "README.md"), []byte(readmeStr), 0644)
+	readmeStr := strings.Replace(strings.Replace(string(readmeTmpl), "{{ TOC }}", toc, 1), "{{ CONTENT }}", content, 1)
+	os.WriteFile(filepath.Join(wd, readmeFile), []byte(readmeStr), 0644)
 }
 
-type STATE int
+const tocTemplate = `
+- [{{ .Name }}](#{{ .Name | toLower }})
+{{ range .Fns }}  - [gfn.{{ .Name }}](#gfn{{ .Name | toLower }})
+{{ end }}
+`
+
+const contentTemplate = `
+## {{ .Name }}
+
+{{ if .Fns }}
+{{ range .Fns }}
+### gfn.{{ .Name }}
+
+;;;go
+{{ .Signature }}
+;;;
+
+{{ .Comment }}
+
+{{ if .Example }}
+;;;go
+{{ .Example }}
+;;;
+{{ end }}
+
+{{ end }}
+{{ end }}
+`
+
+type category struct {
+	Name string
+	Fns  []function
+}
+
+func (c *category) toc() string {
+	sb := strings.Builder{}
+	funcs := template.FuncMap{
+		"toLower": strings.ToLower,
+	}
+	tmlp := template.Must(template.New("toc").Funcs(funcs).Parse(tocTemplate))
+	tmlp.Execute(&sb, c)
+	return strings.TrimSpace(sb.String()) + "\n"
+}
+
+func (c *category) content() string {
+	sb := strings.Builder{}
+	tmpl := template.Must(template.New("function").Parse(strings.ReplaceAll(contentTemplate, ";;;", "```")))
+	tmpl.Execute(&sb, c)
+	return sb.String()
+}
+
+type fnState int
 
 const (
-	STATE_START STATE = iota
-	STATE_COMMENT
-	STATE_EXAMPLE
-	STATE_SIGNATURE
+	state_start fnState = iota
+	state_comment
+	state_example
+	state_finish
+	state_abort
 )
 
-var categories = [][2]string{
-	{"Array", "array.go"},
-	{"Functional", "fp.go"},
-	{"Map", "map.go"},
-	{"Math", "math.go"},
-}
-
-type Category struct {
-	Name string
-	Fns  []Function
-}
-
-func (c *Category) TOC() string {
-	sb := strings.Builder{}
-	sb.WriteString(fmt.Sprintf("- [%s](#%s)\n", c.Name, strings.ToLower(c.Name)))
-	for _, fn := range c.Fns {
-		sb.WriteString(fmt.Sprintf("  - [gfn.%s](#gfn%s)\n", fn.Name, strings.ToLower(fn.Name)))
-	}
-	return sb.String()
-}
-
-func (c *Category) Content() string {
-	sb := strings.Builder{}
-	sb.WriteString(fmt.Sprintf("## %s\n\n", c.Name))
-	for _, fn := range c.Fns {
-		sb.WriteString(fn.Content())
-	}
-	return sb.String()
-}
-
-type Function struct {
+type function struct {
 	Name      string
-	Comments  []string
 	Signature string
-	Example   []string
-	State     STATE
+	Comment   string
+	Example   string
+	state     fnState
 }
 
-func (f *Function) AddComment(line string) {
-	if f.State == STATE_START {
-		f.State = STATE_COMMENT
+func (f *function) addComment(line string) {
+	if f.state == state_start {
+		f.state = state_comment
 		line = strings.TrimPrefix(line, "//")
 		line = strings.TrimSpace(line)
 		words := strings.SplitN(line, " ", 2)
 		f.Name = words[0]
-		f.Comments = append(f.Comments, line)
+		f.Comment = line
 
-	} else if f.State == STATE_COMMENT {
-		f.Comments = append(f.Comments, line)
-
-	} else if f.State == STATE_EXAMPLE {
+	} else if f.state == state_comment {
 		line = strings.TrimPrefix(line, "//")
 		line = strings.TrimSpace(line)
-		f.Example = append(f.Example, line)
+		f.Comment += " " + line
+
+	} else if f.state == state_example {
+		line = strings.TrimPrefix(line, "//")
+		line = strings.TrimSpace(line)
+		if f.Example == "" {
+			f.Example = line
+		} else {
+			f.Example += "\n" + line
+		}
 	}
 }
 
-func (f *Function) AddSignature(line string) {
+func (f *function) addSignature(line string) {
 	line = strings.TrimSpace(line)
+	nameFirstChar := string(strings.TrimPrefix(line, "func ")[0])
+	if nameFirstChar != strings.ToUpper(nameFirstChar) {
+		f.state = state_abort
+		return
+	}
 	line = strings.TrimRight(line, "{")
 	f.Signature = line
-	f.State = STATE_SIGNATURE
+	f.state = state_finish
 }
 
-func (f *Function) AddExample(line string) {
-	f.State = STATE_EXAMPLE
+func (f *function) addExample(line string) {
+	f.state = state_example
 }
 
-func (f *Function) Finish() bool {
-	return f.State == STATE_SIGNATURE
+func (f *function) finish() bool {
+	return f.state == state_finish
 }
 
-func (f *Function) Content() string {
-	sb := strings.Builder{}
-	sb.WriteString(fmt.Sprintf("### gfn.%s\n\n", f.Name))
-	sb.WriteString(fmt.Sprintf("```go\n%s\n```\n\n", f.Signature))
-	sb.WriteString(strings.Join(f.Comments, " ") + "\n\n")
-	if len(f.Example) > 0 {
-		sb.WriteString(fmt.Sprintf("```go\n%s\n```\n\n", strings.Join(f.Example, "\n")))
-	}
-	return sb.String()
+func (f *function) abort() bool {
+	return f.state == state_abort
 }
 
-func processCategory(name, filePath string) (*Category, error) {
+func processCategory(name, filePath string) (*category, error) {
 	lines, err := readFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	cat := Category{}
+	cat := category{}
 	cat.Name = name
 
-	fn := Function{}
-	for _, line := range lines {
+	multiLineComments := map[string][]string{}
+
+	fn := function{}
+	i := 0
+	for i < len(lines) {
+		line := lines[i]
 		if strings.HasPrefix(line, "//") && !strings.HasPrefix(line, "// @example") {
-			fn.AddComment(line)
+			fn.addComment(line)
 
 		} else if strings.HasPrefix(line, "func") {
-			fn.AddSignature(line)
+			fn.addSignature(line)
 
 		} else if strings.HasPrefix(line, "// @example") {
-			fn.AddExample(line)
+			fn.addExample(line)
 
+		} else if strings.HasPrefix(line, "/* @example") {
+			line = strings.TrimPrefix(line, "/* @example")
+			name := strings.TrimSpace(line)
+			comments := []string{}
+			for j := i + 1; j < len(lines); j++ {
+				if strings.HasPrefix(lines[j], "*/") || strings.HasPrefix(lines[j], " */") {
+					i = j + 1
+					break
+				}
+				comments = append(comments, lines[j])
+			}
+			multiLineComments[name] = comments
 		} else {
-			fn = Function{}
+			fn = function{}
 		}
 
-		if fn.Finish() {
+		if fn.finish() {
 			cat.Fns = append(cat.Fns, fn)
-			fn = Function{}
+			fn = function{}
+		} else if fn.abort() {
+			fn = function{}
 		}
+		i++
 	}
+
 	sort.Slice(cat.Fns, func(i, j int) bool {
 		return cat.Fns[i].Name < cat.Fns[j].Name
 	})
+
+	for i := range cat.Fns {
+		fn = cat.Fns[i]
+		if comments, ok := multiLineComments[fn.Name]; ok {
+			if fn.Example == "" {
+				fn.Example = strings.Join(comments, "\n")
+			} else {
+				fn.Example = strings.Join(comments, "\n") + "\n\n" + fn.Example
+			}
+			cat.Fns[i] = fn
+		}
+	}
 	return &cat, nil
 }
 
