@@ -213,7 +213,7 @@ func processCategory(name, filePath string) (*category, error) {
 					i = j + 1
 					break
 				}
-				comments = append(comments, lines[j])
+				comments = append(comments, strings.ReplaceAll(lines[j], "\t", "    "))
 			}
 			multiLineComments[name] = comments
 		} else {
