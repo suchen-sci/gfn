@@ -357,20 +357,36 @@ func TestConcat(t *testing.T) {
 	AssertSliceEqual(t, []int{1, 2, 3, 4, 5}, Concat([]int{1, 2}, []int{}, []int{3}, []int{4}, []int{}, []int{5}))
 }
 
-func TestFindIndex(t *testing.T) {
-	AssertEqual(t, -1, FindIndex([]int{}, func(i int) bool {
-		return i > 0
-	}))
-	AssertEqual(t, 2, FindIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
-		return i > 2
-	}))
+func TestFind(t *testing.T) {
+	{
+		value, index := Find([]string{}, func(s string) bool {
+			return len(s) != 0
+		})
+		AssertEqual(t, -1, index)
+		AssertEqual(t, "", value)
+	}
+	{
+		value, index := Find([]string{"a", "ab", "abc"}, func(s string) bool {
+			return len(s) > 1
+		})
+		AssertEqual(t, 1, index)
+		AssertEqual(t, "ab", value)
+	}
 }
 
-func TestFindLastIndex(t *testing.T) {
-	AssertEqual(t, -1, FindLastIndex([]int{-2, -3, -4}, func(i int) bool {
-		return i > 0
-	}))
-	AssertEqual(t, 4, FindLastIndex([]int{1, 3, 3, 4, 5}, func(i int) bool {
-		return i > 2
-	}))
+func TestFindLast(t *testing.T) {
+	{
+		value, index := FindLast([]string{}, func(s string) bool {
+			return len(s) != 0
+		})
+		AssertEqual(t, -1, index)
+		AssertEqual(t, "", value)
+	}
+	{
+		value, index := FindLast([]string{"a", "ab", "abc"}, func(s string) bool {
+			return len(s) > 1
+		})
+		AssertEqual(t, 2, index)
+		AssertEqual(t, "abc", value)
+	}
 }

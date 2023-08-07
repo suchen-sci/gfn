@@ -402,48 +402,24 @@ func Concat[T any](arrays ...[]T) []T {
 	return res
 }
 
-/* @example FindIndex
-FindIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
-	return i > 2
-})
-// 2
-
-FindIndex([]int{-1, -2}, func(i int) bool {
-	return i > 0
-})
-// -1
-*/
-
-// FindIndex returns the index of the first element in an array that passes a given test,
-// or -1 if not found.
-func FindIndex[T any](array []T, fn func(T) bool) int {
+// Find returns the first element in an array that passes a given test and corresponding index.
+func Find[T any](array []T, fn func(T) bool) (T, int) {
 	for i, v := range array {
 		if fn(v) {
-			return i
+			return v, i
 		}
 	}
-	return -1
+	var res T
+	return res, -1
 }
 
-/* @example FindLastIndex
-FindLastIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
-	return i > 2
-})
-// 4
-
-FindLastIndex([]int{-1, -2}, func(i int) bool {
-	return i > 0
-})
-// -1
-*/
-
-// FindLastIndex returns the index of the last element in an array that passes a given test,
-// or -1 if not found.
-func FindLastIndex[T any](array []T, fn func(T) bool) int {
+// FindLast returns the last element in an array that passes a given test and corresponding index.
+func FindLast[T any](array []T, fn func(T) bool) (T, int) {
 	for i := len(array) - 1; i >= 0; i-- {
 		if fn(array[i]) {
-			return i
+			return array[i], i
 		}
 	}
-	return -1
+	var res T
+	return res, -1
 }
