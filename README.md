@@ -23,8 +23,8 @@ My friend once complained to me that `Golang` is too simple, apart from the esse
   - [gfn.Distribution](#gfndistribution)
   - [gfn.Equal](#gfnequal)
   - [gfn.Fill](#gfnfill)
-  - [gfn.FindIndex](#gfnfindindex)
-  - [gfn.FindLastIndex](#gfnfindlastindex)
+  - [gfn.Find](#gfnfind)
+  - [gfn.FindLast](#gfnfindlast)
   - [gfn.GroupBy](#gfngroupby)
   - [gfn.IndexOf](#gfnindexof)
   - [gfn.IsSorted](#gfnissorted)
@@ -277,49 +277,25 @@ Fill(array2[2:], 100)
 
 
 
-### gfn.FindIndex
+### gfn.Find
 
 ```go
-func FindIndex[T any](array []T, fn func(T) bool) int 
+func Find[T any](array []T, fn func(T) bool) (T, int) 
 ```
 
-FindIndex returns the index of the first element in an array that passes a given test, or -1 if not found.
+Find returns the first element in an array that passes a given test and corresponding index.
 
+
+
+
+### gfn.FindLast
 
 ```go
-FindIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
-    return i > 2
-})
-// 2
-
-FindIndex([]int{-1, -2}, func(i int) bool {
-    return i > 0
-})
-// -1
+func FindLast[T any](array []T, fn func(T) bool) (T, int) 
 ```
 
+FindLast returns the last element in an array that passes a given test and corresponding index.
 
-
-### gfn.FindLastIndex
-
-```go
-func FindLastIndex[T any](array []T, fn func(T) bool) int 
-```
-
-FindLastIndex returns the index of the last element in an array that passes a given test, or -1 if not found.
-
-
-```go
-FindLastIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
-    return i > 2
-})
-// 4
-
-FindLastIndex([]int{-1, -2}, func(i int) bool {
-    return i > 0
-})
-// -1
-```
 
 
 
