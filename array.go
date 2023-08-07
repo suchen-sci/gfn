@@ -390,3 +390,60 @@ func Any[T any](array []T, fn func(T) bool) bool {
 	}
 	return false
 }
+
+// Concat returns a new array that is the result of joining two or more arrays.
+// @example
+// gfn.Concat([]int{1, 2}, []int{3, 4})  // []int{1, 2, 3, 4}
+func Concat[T any](arrays ...[]T) []T {
+	var res []T
+	for _, array := range arrays {
+		res = append(res, array...)
+	}
+	return res
+}
+
+/* @example FindIndex
+FindIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
+	return i > 2
+})
+// 2
+
+FindIndex([]int{-1, -2}, func(i int) bool {
+	return i > 0
+})
+// -1
+*/
+
+// FindIndex returns the index of the first element in an array that passes a given test,
+// or -1 if not found.
+func FindIndex[T any](array []T, fn func(T) bool) int {
+	for i, v := range array {
+		if fn(v) {
+			return i
+		}
+	}
+	return -1
+}
+
+/* @example FindLastIndex
+FindLastIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
+	return i > 2
+})
+// 4
+
+FindLastIndex([]int{-1, -2}, func(i int) bool {
+	return i > 0
+})
+// -1
+*/
+
+// FindLastIndex returns the index of the last element in an array that passes a given test,
+// or -1 if not found.
+func FindLastIndex[T any](array []T, fn func(T) bool) int {
+	for i := len(array) - 1; i >= 0; i-- {
+		if fn(array[i]) {
+			return i
+		}
+	}
+	return -1
+}

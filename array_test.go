@@ -349,3 +349,28 @@ func TestAny(t *testing.T) {
 		return i > 5
 	}))
 }
+
+func TestConcat(t *testing.T) {
+	AssertSliceEqual(t, []int{1, 2, 3, 4, 5}, Concat([]int{1, 2}, []int{3, 4, 5}))
+	AssertSliceEqual(t, []int{1, 2, 3, 4, 5}, Concat([]int{1, 2}, []int{3}, []int{4, 5}))
+	AssertSliceEqual(t, []int{1, 2, 3, 4, 5}, Concat([]int{1, 2}, []int{3}, []int{4}, []int{5}))
+	AssertSliceEqual(t, []int{1, 2, 3, 4, 5}, Concat([]int{1, 2}, []int{}, []int{3}, []int{4}, []int{}, []int{5}))
+}
+
+func TestFindIndex(t *testing.T) {
+	AssertEqual(t, -1, FindIndex([]int{}, func(i int) bool {
+		return i > 0
+	}))
+	AssertEqual(t, 2, FindIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
+		return i > 2
+	}))
+}
+
+func TestFindLastIndex(t *testing.T) {
+	AssertEqual(t, -1, FindLastIndex([]int{-2, -3, -4}, func(i int) bool {
+		return i > 0
+	}))
+	AssertEqual(t, 4, FindLastIndex([]int{1, 3, 3, 4, 5}, func(i int) bool {
+		return i > 2
+	}))
+}
