@@ -15,6 +15,7 @@ My friend once complained to me that `Golang` is too simple, apart from the esse
 - [Array](#array)
   - [gfn.All](#gfnall)
   - [gfn.Any](#gfnany)
+  - [gfn.Concat](#gfnconcat)
   - [gfn.Contains](#gfncontains)
   - [gfn.Copy](#gfncopy)
   - [gfn.Count](#gfncount)
@@ -22,6 +23,8 @@ My friend once complained to me that `Golang` is too simple, apart from the esse
   - [gfn.Distribution](#gfndistribution)
   - [gfn.Equal](#gfnequal)
   - [gfn.Fill](#gfnfill)
+  - [gfn.FindIndex](#gfnfindindex)
+  - [gfn.FindLastIndex](#gfnfindlastindex)
   - [gfn.GroupBy](#gfngroupby)
   - [gfn.IndexOf](#gfnindexof)
   - [gfn.IsSorted](#gfnissorted)
@@ -145,6 +148,21 @@ gfn.Any([]int{1, 2, 3, 4}, func(i int) bool {
 
 
 
+### gfn.Concat
+
+```go
+func Concat[T any](arrays ...[]T) []T 
+```
+
+Concat returns a new array that is the result of joining two or more arrays.
+
+
+```go
+gfn.Concat([]int{1, 2}, []int{3, 4})  // []int{1, 2, 3, 4}
+```
+
+
+
 ### gfn.Contains
 
 ```go
@@ -255,6 +273,52 @@ Fill(array, true)
 array2 := make([]int, 5)
 Fill(array2[2:], 100)
 // []int{0, 0, 100, 100, 100}
+```
+
+
+
+### gfn.FindIndex
+
+```go
+func FindIndex[T any](array []T, fn func(T) bool) int 
+```
+
+FindIndex returns the index of the first element in an array that passes a given test, or -1 if not found.
+
+
+```go
+FindIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
+    return i > 2
+})
+// 2
+
+FindIndex([]int{-1, -2}, func(i int) bool {
+    return i > 0
+})
+// -1
+```
+
+
+
+### gfn.FindLastIndex
+
+```go
+func FindLastIndex[T any](array []T, fn func(T) bool) int 
+```
+
+FindLastIndex returns the index of the last element in an array that passes a given test, or -1 if not found.
+
+
+```go
+FindLastIndex([]int{1, 2, 3, 4, 5}, func(i int) bool {
+    return i > 2
+})
+// 4
+
+FindLastIndex([]int{-1, -2}, func(i int) bool {
+    return i > 0
+})
+// -1
 ```
 
 
