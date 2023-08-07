@@ -1,28 +1,54 @@
 # gfn
 `gfn` is a Golang library that leverages generics to provide various methods, including common functional programming techniques such as `Map`, `Reduce`, and `Filter`, along with other utilities like `Contains`, `Keys`, etc.
 
+No `reflect`. No third-party packages. `O(n)`.
+
+## Why this lib?
+My friend once complained to me that `Golang` is too simple, apart from the essentials, there's hardly anything else. Want to reverse an array? Not available! As a die-hard Gopher, I decided to do something, and hence this library was born. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Golang` as possible. The implementation mainly refers to the methods from `Python`, `Ruby`, and `JavaScript`. I hope this library can be helpful when using `Golang`.
 
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Type](#type)
 - [Array](#array)
+  - [gfn.All](#gfnall)
+  - [gfn.Any](#gfnany)
   - [gfn.Contains](#gfncontains)
+  - [gfn.Copy](#gfncopy)
+  - [gfn.Count](#gfncount)
+  - [gfn.Diff](#gfndiff)
   - [gfn.Distribution](#gfndistribution)
   - [gfn.Equal](#gfnequal)
+  - [gfn.Fill](#gfnfill)
+  - [gfn.GroupBy](#gfngroupby)
+  - [gfn.IndexOf](#gfnindexof)
   - [gfn.IsSorted](#gfnissorted)
   - [gfn.IsSortedBy](#gfnissortedby)
+  - [gfn.LastIndexOf](#gfnlastindexof)
   - [gfn.Range](#gfnrange)
   - [gfn.RangeBy](#gfnrangeby)
+  - [gfn.Reverse](#gfnreverse)
+  - [gfn.Sample](#gfnsample)
   - [gfn.Shuffle](#gfnshuffle)
   - [gfn.ToSet](#gfntoset)
+  - [gfn.Union](#gfnunion)
+  - [gfn.Uniq](#gfnuniq)
   - [gfn.Unzip](#gfnunzip)
   - [gfn.Zip](#gfnzip)
 - [Functional](#functional)
   - [gfn.Filter](#gfnfilter)
   - [gfn.Map](#gfnmap)
 - [Map](#map)
+  - [gfn.Clear](#gfnclear)
+  - [gfn.Clone](#gfnclone)
   - [gfn.Compare](#gfncompare)
+  - [gfn.DeleteBy](#gfndeleteby)
+  - [gfn.Invert](#gfninvert)
+  - [gfn.Items](#gfnitems)
+  - [gfn.Keys](#gfnkeys)
+  - [gfn.Rejected](#gfnrejected)
+  - [gfn.Update](#gfnupdate)
+  - [gfn.Values](#gfnvalues)
 - [Math](#math)
   - [gfn.Abs](#gfnabs)
   - [gfn.DivMod](#gfndivmod)
@@ -81,6 +107,42 @@ type Pair[T, U any] struct {
 
 
 
+### gfn.All
+
+```go
+func All[T any](array []T, fn func(T) bool) bool 
+```
+
+All returns true if all elements in an array pass a given test.
+
+
+```go
+gfn.All([]int{1, 2, 3, 4}, func(i int) bool {
+    return i > 0
+}
+// true
+```
+
+
+
+### gfn.Any
+
+```go
+func Any[T any](array []T, fn func(T) bool) bool 
+```
+
+Any returns true if at least one element in an array passes a given test.
+
+
+```go
+gfn.Any([]int{1, 2, 3, 4}, func(i int) bool {
+    return i > 3
+}
+// true
+```
+
+
+
 ### gfn.Contains
 
 ```go
@@ -94,6 +156,51 @@ Contains returns true if the array contains the value.
 gfn.Contains([]int{1, 2, 3}, 2)             // true
 gfn.Contains([]string{"a", "b", "c"}, "b")  // true
 gfn.Contains([]time.Duration{time.Second}, time.Second)  // true
+```
+
+
+
+### gfn.Copy
+
+```go
+func Copy[T any](array []T) []T 
+```
+
+Copy returns a new array that is a shallow copy of the original array.
+
+
+```go
+gfn.Copy([]int{1, 2, 3})  // []int{1, 2, 3}
+
+array := []int{1, 2, 3, 4, 5, 6}
+gfn.Copy(array[2:])
+// []int{3, 4, 5, 6}
+```
+
+
+
+### gfn.Count
+
+```go
+func Count[T comparable](array []T, value T) int 
+```
+
+Count returns the number of occurrences of a value in an array.
+
+
+
+
+### gfn.Diff
+
+```go
+func Diff[T comparable](array []T, others ...[]T) []T 
+```
+
+Diff returns a new array that is a copy of the original array, removing all occurrences of any item that also appear in others. The order is preserved from the original array.
+
+
+```go
+gfn.Diff([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
 ```
 
 
@@ -129,6 +236,68 @@ gfn.Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"})  // false
 
 
 
+### gfn.Fill
+
+```go
+func Fill[T any](array []T, value T) 
+```
+
+Fill sets all elements of an array to a given value.
+
+
+```go
+array := make([]bool, 5)
+Fill(array, true)
+// []bool{true, true, true, true, true}
+
+array2 := make([]int, 5)
+Fill(array2[2:], 100)
+// []int{0, 0, 100, 100, 100}
+```
+
+
+
+### gfn.GroupBy
+
+```go
+func GroupBy[T any, K comparable](array []T, groupFn func(T) K) map[K][]T 
+```
+
+GroupBy generate a map of arrays by grouping the elements of an array according to a given function.
+
+
+```go
+array := []int{1, 2, 3, 4, 5, 6, 7, 8}
+groups := GroupBy(array, func(i int) string {
+    if i%2 == 0 {
+        return "even"
+    }
+    return "odd"
+})
+// map[string][]int{
+//     "even": []int{2, 4, 6, 8},
+//     "odd":  []int{1, 3, 5, 7},
+// }
+```
+
+
+
+### gfn.IndexOf
+
+```go
+func IndexOf[T comparable](array []T, value T) int 
+```
+
+IndexOf returns the index of the first occurrence of a value in an array, or -1 if not found.
+
+
+```go
+gfn.IndexOf([]int{1, 2, 3, 4}, 3)  // 2
+gfn.IndexOf([]int{1, 2, 3, 4}, 5)  // -1
+```
+
+
+
 ### gfn.IsSorted
 
 ```go
@@ -156,6 +325,22 @@ IsSortedBy returns true if the array is sorted in the given order. The order fun
 ```go
 gfn.IsSortedBy([]int{2, 2, 1, 1, -1, -1}, func(a, b int) bool { return a >= b })
 // true
+```
+
+
+
+### gfn.LastIndexOf
+
+```go
+func LastIndexOf[T comparable](array []T, value T) int 
+```
+
+LastIndexOf returns the index of the last occurrence of a value in an array, or -1 if not found.
+
+
+```go
+gfn.LastIndexOf([]int{3, 3, 3, 4}, 3)  // 2
+gfn.LastIndexOf([]int{1, 2, 3, 4}, 5)  // -1
 ```
 
 
@@ -194,6 +379,38 @@ gfn.RangeBy(10, 0, -2) // []int{10, 8, 6, 4, 2}
 
 
 
+### gfn.Reverse
+
+```go
+func Reverse[T any](array []T) 
+```
+
+Reverse reverses an array in place.
+
+
+```go
+array := []int{1, 2, 3, 4}
+gfn.Reverse(array)
+// []int{4, 3, 2, 1}
+```
+
+
+
+### gfn.Sample
+
+```go
+func Sample[T any](array []T, n int) []T 
+```
+
+Sample returns a random sample of n elements from an array.
+
+
+```go
+gfn.Sample([]int{1, 2, 3, 4, 5}, 3)  // []int{3, 1, 5} or other random choices.
+```
+
+
+
 ### gfn.Shuffle
 
 ```go
@@ -223,6 +440,37 @@ ToSet converts an array to a set.
 ```go
 gfn.ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
 // map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
+```
+
+
+
+### gfn.Union
+
+```go
+func Union[T comparable](arrays ...[]T) []T 
+```
+
+Union returns an array with all duplicates removed from multiple arrays.
+
+
+```go
+gfn.Union([]int{1, 2, 3}, []int{2, 3, 4}, []int{3, 4, 5})
+// []int{1, 2, 3, 4, 5}
+```
+
+
+
+### gfn.Uniq
+
+```go
+func Uniq[T comparable](array []T) []T 
+```
+
+Uniq returns an array with all duplicates removed.
+
+
+```go
+gfn.Uniq([]int{1, 2, 2, 3, 3, 3, 4, 4, 4, 4})  // []int{1, 2, 3, 4}
 ```
 
 
@@ -320,10 +568,44 @@ gfn.Map([]int{1, 2, 3}, func(i int) string { return i+1 })
 
 
 
+### gfn.Clear
+
+```go
+func Clear[K comparable, V any](m map[K]V) 
+```
+
+Clear removes all keys from a map.
+
+
+```go
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+gfn.Clear(m)
+// m is now an empty map
+```
+
+
+
+### gfn.Clone
+
+```go
+func Clone[K comparable, V any](m map[K]V) map[K]V 
+```
+
+Clone returns a shallow copy of a map.
+
+
+```go
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+m2 := Clone(m)
+// m2 is a copy of m
+```
+
+
+
 ### gfn.Compare
 
 ```go
-func Compare[T, V comparable](a map[T]V, b map[T]V) bool 
+func Compare[K, V comparable](a map[K]V, b map[K]V) bool 
 ```
 
 Compare returns true if two maps/sets are equal.
@@ -333,6 +615,145 @@ Compare returns true if two maps/sets are equal.
 map1 := map[int]struct{}{1: {}, 2: {}, 3: {}}
 map2 := map[int]struct{}{1: {}, 2: {}, 3: {}}
 Compare(map1, map2) // true
+```
+
+
+
+### gfn.DeleteBy
+
+```go
+func DeleteBy[K comparable, V any](m map[K]V, deleteFn func(K, V) bool) 
+```
+
+DeleteBy deletes keys from a map if the predicate function returns true.
+
+
+```go
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+DeleteBy(m, func(k int, v string) bool {
+    return k == 1 || v == "c"
+})
+// map[int]string{2: "b"}
+```
+
+
+
+### gfn.Invert
+
+```go
+func Invert[K, V comparable](m map[K]V) map[V]K 
+```
+
+Invert returns a map with keys and values swapped.
+
+
+```go
+m := map[string]string{
+    "Array": "array.go",
+    "Map":   "map.go",
+    "Set":   "set.go",
+    "Math":  "math.go",
+}
+
+gfn.Invert(m)
+// map[string]string{
+//     "array.go": "Array",
+//     "map.go":   "Map",
+//     "set.go":   "Set",
+//     "math.go":  "Math",
+// }
+```
+
+
+
+### gfn.Items
+
+```go
+func Items[K comparable, V any](m map[K]V) []Pair[K, V] 
+```
+
+Items returns a slice of pairs of keys and values.
+
+
+```go
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+
+gfn.Items(m)
+// []Pair[int, string]{
+//     {1, "a"},
+//     {2, "b"},
+//     {3, "c"},
+// }
+```
+
+
+
+### gfn.Keys
+
+```go
+func Keys[K comparable, V any](m map[K]V) []K 
+```
+
+Keys returns the keys of a map.
+
+
+```go
+gfn.Keys(map[int]string{1: "a", 2: "b", 3: "c"})
+// []int{1, 2, 3} or []int{3, 2, 1} or []int{2, 1, 3} etc.
+```
+
+
+
+### gfn.Rejected
+
+```go
+func Rejected[K comparable, V any](m map[K]V, keep func(K, V) bool) map[K]V 
+```
+
+Rejected returns a map with keys and values that don't pass the predicate function.
+
+
+```go
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+rejected := Rejected(m, func(k int, v string) bool {
+    return k == 1 || v == "c"
+})
+// map[int]string{2: "b"}
+```
+
+
+
+### gfn.Update
+
+```go
+func Update[K comparable, V any](m map[K]V, other ...map[K]V) 
+```
+
+Update updates a map with the keys and values from other maps.
+
+
+```go
+m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+m2 := map[int]string{1: "d", 2: "e"}
+m3 := map[int]string{1: "f"}
+Update(m1, m2, m3)
+// map[int]string{1: "f", 2: "e", 3: "c"}
+```
+
+
+
+### gfn.Values
+
+```go
+func Values[K comparable, V any](m map[K]V) []V 
+```
+
+Values returns the values of a map.
+
+
+```go
+gfn.Values(map[int]string{1: "a", 2: "b", 3: "c"})
+// []string{"a", "b", "c"} or []string{"c", "b", "a"} or []string{"b", "a", "c"} etc.
 ```
 
 
