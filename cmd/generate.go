@@ -83,6 +83,7 @@ const contentTemplate = `
 {{ .Comment }}
 
 {{ if .Example }}
+#### Example:
 ;;;go
 {{ .Example }}
 ;;;
