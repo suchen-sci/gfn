@@ -36,6 +36,10 @@ func TestContains(t *testing.T) {
 
 	AssertTrue(t, Contains([]time.Duration{time.Second, 2 * time.Second}, time.Second))
 	AssertFalse(t, Contains([]time.Duration{time.Second, 2 * time.Second}, 3*time.Second))
+
+	type Number int
+	type Numbers []Number
+	AssertTrue(t, Contains(Numbers{1, 2, 3}, Number(2)))
 }
 
 func TestRange(t *testing.T) {
@@ -190,4 +194,158 @@ func TestUnzip(t *testing.T) {
 			return 0, ""
 		})
 	})
+}
+
+func TestSample(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		array := Range(i, i+100)
+		samples := Sample(array, 10)
+		AssertEqual(t, 10, len(samples))
+		m := map[int]struct{}{}
+		for _, sample := range samples {
+			_, ok := m[sample]
+			AssertFalse(t, ok)
+			m[sample] = struct{}{}
+			AssertTrue(t, Contains(array, sample))
+		}
+	}
+
+	AssertPanics(t, func() {
+		Sample([]int{}, 1)
+	})
+
+	AssertPanics(t, func() {
+		Sample([]int{1}, -1)
+	})
+}
+
+func TestUniq(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		array := []int{}
+		start := rand.Intn(100)
+		for j := start; j < start+100; j++ {
+			array = append(array, j, j, j)
+		}
+		Shuffle(array)
+		array = Uniq(array)
+		sort.Ints(array)
+		AssertEqual(t, 100, len(array))
+		AssertSliceEqual(t, Range(start, start+100), array)
+	}
+}
+
+func TestUnion(t *testing.T) {
+	a1 := []int{1, 2, 2, 3, 3, 4, 5}
+	a2 := []int{2, 3, 3, 4, 4, 5, 6}
+	a3 := []int{3, 4, 4, 5, 5, 6, 7}
+	AssertSliceEqual(t, []int{1, 2, 3, 4, 5, 6, 7}, Union(a1, a2, a3))
+}
+
+func TestCopy(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5}
+	b := Copy(a)
+	AssertSliceEqual(t, a, b)
+	a[0] = 100
+	AssertEqual(t, 1, b[0])
+
+	c := []int{1, 2, 3, 4, 5}
+	d := Copy(c[2:])
+	AssertSliceEqual(t, []int{3, 4, 5}, d)
+}
+
+func TestDiff(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5, 6, 7}
+	b := []int{2, 4, 6}
+	c := []int{1, 3, 5, 7}
+	AssertSliceEqual(t, c, Diff(a, b))
+
+	for i := 0; i < 100; i++ {
+		a := Range(i, i+200)
+		b := Range(i+50, i+150)
+		c := Range(i+150, i+200)
+		Shuffle(a)
+		Shuffle(b)
+		Shuffle(c)
+
+		d := Diff(a, b, c)
+		sort.Ints(d)
+		AssertSliceEqual(t, Range(i, i+50), d)
+	}
+}
+
+func TestFill(t *testing.T) {
+	array := make([]bool, 5)
+	AssertSliceEqual(t, []bool{false, false, false, false, false}, array)
+	Fill(array, true)
+	AssertSliceEqual(t, []bool{true, true, true, true, true}, array)
+
+	array2 := make([]int, 5)
+	Fill(array2[2:], 100)
+	AssertSliceEqual(t, []int{0, 0, 100, 100, 100}, array2)
+}
+
+func TestCount(t *testing.T) {
+	array := Range(0, 200)
+	Shuffle(array)
+	for i := 0; i < 200; i++ {
+		AssertEqual(t, 1, Count(array, i))
+	}
+
+	array2 := []int{1, 1, 1, 2, 1, 4, 1}
+	AssertEqual(t, 5, Count(array2, 1))
+}
+
+func TestGroupBy(t *testing.T) {
+	array := []int{1, 2, 3, 4, 5, 6, 7, 8}
+	groups := GroupBy(array, func(i int) string {
+		if i%2 == 0 {
+			return "even"
+		}
+		return "odd"
+	})
+	AssertEqual(t, 2, len(groups))
+	AssertSliceEqual(t, []int{2, 4, 6, 8}, groups["even"])
+	AssertSliceEqual(t, []int{1, 3, 5, 7}, groups["odd"])
+}
+
+func TestIndexOf(t *testing.T) {
+	AssertEqual(t, -1, IndexOf([]int{}, 1))
+	AssertEqual(t, -1, IndexOf([]int{1, 2, 3}, 4))
+	AssertEqual(t, 2, IndexOf([]int{1, 2, 3}, 3))
+	AssertEqual(t, 2, IndexOf([]int{1, 2, 3, 3, 3}, 3))
+}
+
+func TestLastIndexOf(t *testing.T) {
+	AssertEqual(t, -1, LastIndexOf([]int{}, 1))
+	AssertEqual(t, -1, LastIndexOf([]int{1, 2, 3}, 4))
+	AssertEqual(t, 2, LastIndexOf([]int{3, 3, 3}, 3))
+	AssertEqual(t, 0, LastIndexOf([]int{3, 2, 2, 2, 2}, 3))
+}
+
+func TestReverse(t *testing.T) {
+	array := []int{1, 2, 3, 4, 5}
+	Reverse(array)
+	AssertSliceEqual(t, []int{5, 4, 3, 2, 1}, array)
+
+	array2 := []int{1, 2, 3, 4}
+	Reverse(array2)
+	AssertSliceEqual(t, []int{4, 3, 2, 1}, array2)
+}
+
+func TestAll(t *testing.T) {
+	AssertTrue(t, All([]int{1, 2, 3, 4, 5}, func(i int) bool {
+		return i > 0
+	}))
+	AssertFalse(t, All([]int{1, 2, 3, 4, 5}, func(i int) bool {
+		return i > 1
+	}))
+}
+
+func TestAny(t *testing.T) {
+	AssertTrue(t, Any([]int{1, 2, 3, 4, 5}, func(i int) bool {
+		return i > 4
+	}))
+	AssertFalse(t, Any([]int{1, 2, 3, 4, 5}, func(i int) bool {
+		return i > 5
+	}))
 }
