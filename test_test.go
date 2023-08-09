@@ -56,6 +56,29 @@ func AssertSliceEqual[T comparable](t *testing.T, expected []T, actual []T, tags
 	}
 }
 
+func AssertMapEqual[T comparable, V comparable](t *testing.T, expected map[T]V, actual map[T]V, tags ...string) {
+	t.Helper()
+	if expected == nil || actual == nil {
+		if expected == nil && actual == nil {
+			return
+		}
+		fail(t, fmt.Sprintf("expected: %v, actual: %v", expected, actual), tags...)
+		return
+	}
+
+	if len(expected) != len(actual) {
+		fail(t, fmt.Sprintf("expected: %v, actual: %v", expected, actual), tags...)
+		return
+	}
+
+	for k, v := range expected {
+		if actualV, ok := actual[k]; !ok || v != actualV {
+			fail(t, fmt.Sprintf("expected: %v, actual: %v", expected, actual), tags...)
+			return
+		}
+	}
+}
+
 func AssertTrue(t *testing.T, actual bool, tags ...string) {
 	t.Helper()
 	if !actual {
