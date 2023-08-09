@@ -52,18 +52,14 @@ func skipFn(a int) int {
 		t.Fatalf("toc not match, expect: %s, got: %s", toc, cat.toc())
 	}
 
-	content := `## Test
-
+	content := ` ## Test
 
 
 ### gfn.F1
-
 ;;;go
 func F1(a int) int 
 ;;;
-
 F1 is f1.
-
 
 #### Example:
 ;;;go
@@ -72,8 +68,9 @@ this is multiline comments for F1.
 F1(1)
 ;;;
 `
-	content = strings.TrimSpace(strings.ReplaceAll(content, ";;;", "```"))
-	if content != strings.TrimSpace(cat.content()) {
-		t.Fatalf("content not match, expect: %s, got: %s", content, cat.content())
+	expected := strings.TrimSpace(strings.ReplaceAll(content, ";;;", "```"))
+	got := strings.TrimSpace(cat.content())
+	if expected != got {
+		t.Fatalf("content not match, expect: %s, got: %s", expected, got)
 	}
 }

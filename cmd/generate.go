@@ -71,24 +71,19 @@ const tocTemplate = `
 
 const contentTemplate = `
 ## {{ .Name }}
-
 {{ if .Fns }}
 {{ range .Fns }}
 ### gfn.{{ .Name }}
-
 ;;;go
 {{ .Signature }}
 ;;;
-
 {{ .Comment }}
-
 {{ if .Example }}
 #### Example:
 ;;;go
 {{ .Example }}
 ;;;
 {{ end }}
-
 {{ end }}
 {{ end }}
 `
