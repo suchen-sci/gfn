@@ -38,7 +38,7 @@ func Filter[T any](array []T, filter func(T) bool) []T {
 
 /* @example FilterKV
 m := map[int]string{1: "a", 2: "b", 3: "c"}
-FilterKV(m, func(k int, v string) bool {
+gfn.FilterKV(m, func(k int, v string) bool {
 	return k == 1 || v == "c"
 })
 // map[int]string{1: "a", 3: "c"}
@@ -51,7 +51,7 @@ func FilterKV[K comparable, V any](m map[K]V, fn func(K, V) bool) map[K]V {
 }
 
 /* @example Reduce
-Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
+gfn.Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
 	return a + b
 })
 // 6
@@ -69,7 +69,7 @@ func Reduce[T any, R any](array []T, initialValue R, reducer func(R, T) R) R {
 
 /* @example ReduceKV
 m := map[string]int{"a": 1, "b": 2, "c": 3}
-total := ReduceKV(m, 0, func(value int, k string, v int) int {
+total := gfn.ReduceKV(m, 0, func(value int, k string, v int) int {
 	return value + v
 })
 // 6
