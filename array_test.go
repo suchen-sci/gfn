@@ -122,7 +122,7 @@ func TestToSet(t *testing.T) {
 	}
 
 	expected := map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
-	AssertTrue(t, Compare(expected, set))
+	AssertMapEqual(t, expected, set)
 }
 
 func TestIsSortedBy(t *testing.T) {
@@ -138,7 +138,7 @@ func TestIsSortedBy(t *testing.T) {
 
 func TestDistribution(t *testing.T) {
 	// check empty array
-	AssertTrue(t, Compare(map[int]int{}, Distribution([]int{})))
+	AssertMapEqual(t, map[int]int{}, Counter([]int{}))
 
 	// check array with many elements
 	{
@@ -149,16 +149,16 @@ func TestDistribution(t *testing.T) {
 		rand.Shuffle(len(array), func(i, j int) {
 			array[i], array[j] = array[j], array[i]
 		})
-		distr := Distribution(array)
+		distr := Counter(array)
 		for i := 0; i < 100000; i++ {
 			AssertEqual(t, 1, distr[i])
 		}
 	}
 
 	// check distribution
-	AssertTrue(t, Compare(map[int]int{1: 1, 2: 1, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4})))
-	AssertTrue(t, Compare(map[int]int{1: 1, 2: 2, 3: 1, 4: 1}, Distribution([]int{1, 2, 3, 4, 2})))
-	AssertTrue(t, Compare(map[int]int{1: 1, 2: 4}, Distribution([]int{1, 2, 2, 2, 2})))
+	AssertMapEqual(t, map[int]int{1: 1, 2: 1, 3: 1, 4: 1}, Counter([]int{1, 2, 3, 4}))
+	AssertMapEqual(t, map[int]int{1: 1, 2: 2, 3: 1, 4: 1}, Counter([]int{1, 2, 3, 4, 2}))
+	AssertMapEqual(t, map[int]int{1: 1, 2: 4}, Counter([]int{1, 2, 2, 2, 2}))
 }
 
 func TestIsSorted(t *testing.T) {
@@ -388,5 +388,214 @@ func TestFindLast(t *testing.T) {
 		})
 		AssertEqual(t, 2, index)
 		AssertEqual(t, "abc", value)
+	}
+}
+
+func TestRemove(t *testing.T) {
+	{
+		array := []int{1, 2, 3, 4, 2, 4}
+		AssertSliceEqual(t, []int{1, 3, 4, 4}, Remove(array, 2))
+	}
+	{
+		array := []int{1, 2, 3, 4, 2, 4}
+		AssertSliceEqual(t, []int{1, 3}, Remove(array, 2, 4))
+	}
+}
+
+func TestIntersect(t *testing.T) {
+	{
+		arr1 := []int{1, 2, 3, 4, 5}
+		arr2 := []int{2, 3, 4, 5, 6}
+		arr3 := []int{5, 4, 3, 2}
+		arr4 := []int{2, 3}
+		AssertSliceEqual(t, []int{2, 3}, Intersect(arr1, arr2, arr3, arr4))
+	}
+	{
+		arr1 := []int{1, 2, 3, 4, 5, 4, 3, 2, 1}
+		arr2 := []int{2, 3, 4, 5, 6, 2, 3, 2, 3}
+		arr3 := []int{5, 4, 3, 2, 2, 3}
+		arr4 := []int{2, 3, 2, 3, 2, 3}
+		AssertSliceEqual(t, []int{2, 3}, Intersect(arr1, arr2, arr3, arr4))
+	}
+
+	AssertPanics(t, func() {
+		Intersect[int]()
+	})
+	AssertPanics(t, func() {
+		Intersect([]int{1, 2, 3})
+	})
+}
+
+func TestRepeat(t *testing.T) {
+	AssertSliceEqual(t, []int{5, 5, 5}, Repeat([]int{5}, 3))
+	AssertSliceEqual(t, []int{5, 3, 1, 5, 3, 1, 5, 3, 1}, Repeat([]int{5, 3, 1}, 3))
+	AssertSliceEqual(t, []int{}, Repeat([]int{5, 3, 1}, 0))
+	AssertSliceEqual(t, []int{5, 3, 1}, Repeat([]int{5, 3, 1}, 1))
+	AssertSliceEqual(t, []int{}, Repeat[int](nil, 1))
+
+	AssertPanics(t, func() {
+		Repeat[int](nil, -1)
+	})
+}
+
+func TestForEach(t *testing.T) {
+	sum := 0
+	ForEach([]int{1, 2, 3}, func(i int) {
+		sum += i
+	})
+	AssertEqual(t, 6, sum)
+}
+
+func TestCountBy(t *testing.T) {
+	type Employee struct {
+		name       string
+		department string
+	}
+	employees := []Employee{
+		{"Alice", "Accounting"},
+		{"Bob", "Accounting"},
+		{"Cindy", "Engineering"},
+		{"Dave", "Engineering"},
+		{"Eve", "Engineering"},
+	}
+	AssertEqual(t, 3, CountBy(employees, func(e Employee) bool {
+		return e.department == "Engineering"
+	}))
+}
+
+func TestDistributionBy(t *testing.T) {
+	type Employee struct {
+		name       string
+		department string
+	}
+	employees := []Employee{
+		{"Alice", "Accounting"},
+		{"Bob", "Accounting"},
+		{"Cindy", "Engineering"},
+		{"Dave", "Engineering"},
+		{"Eve", "Engineering"},
+	}
+	dist := CounterBy(employees, func(e Employee) string {
+		return e.department
+	})
+	AssertMapEqual(t, map[string]int{"Accounting": 2, "Engineering": 3}, dist)
+}
+
+func TestUniqBy(t *testing.T) {
+	type Employee struct {
+		name       string
+		department string
+	}
+	employees := []Employee{
+		{"Alice", "Accounting"},
+		{"Bob", "Accounting"},
+		{"Cindy", "Engineering"},
+		{"Dave", "Engineering"},
+		{"Eve", "Engineering"},
+	}
+	uniq := UniqBy(employees, func(e Employee) string {
+		return e.department
+	})
+	expected := []Employee{
+		{"Alice", "Accounting"},
+		{"Cindy", "Engineering"},
+	}
+	AssertSliceEqual(t, expected, uniq)
+}
+
+func TestUnionBy(t *testing.T) {
+	type Employee struct {
+		name       string
+		department string
+	}
+	group1 := []Employee{
+		{"Alice", "Accounting"},
+		{"Bob", "Accounting"},
+		{"Cindy", "Engineering"},
+	}
+	group2 := []Employee{
+		{"Alice", "Accounting"},
+		{"Cindy", "Engineering"},
+		{"Dave", "Engineering"},
+		{"Eve", "Engineering"},
+	}
+	union := UnionBy(func(e Employee) string { return e.name }, group1, group2)
+	expected := []Employee{
+		{"Alice", "Accounting"},
+		{"Bob", "Accounting"},
+		{"Cindy", "Engineering"},
+		{"Dave", "Engineering"},
+		{"Eve", "Engineering"},
+	}
+	AssertSliceEqual(t, expected, union)
+}
+
+func TestIntersectBy(t *testing.T) {
+	type Data struct {
+		value int
+	}
+	data1 := []Data{{1}, {3}, {2}, {4}, {5}}
+	data2 := []Data{{2}, {3}, {4}, {5}, {6}}
+	data3 := []Data{{5}, {4}, {3}, {2}}
+	data4 := []Data{{2}, {3}}
+	intersect := IntersectBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
+	expected := []Data{{3}, {2}}
+	AssertSliceEqual(t, expected, intersect)
+}
+
+func TestDiffBy(t *testing.T) {
+	type Data struct {
+		value int
+	}
+	data1 := []Data{{1}, {3}, {2}, {4}, {5}, {2}}
+	data2 := []Data{{3}, {4}, {5}, {6}}
+	data3 := []Data{{5}, {4}, {3}}
+	data4 := []Data{{3}, {4}}
+	intersect := DiffBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
+	expected := []Data{{1}, {2}, {2}}
+	AssertSliceEqual(t, expected, intersect)
+}
+
+func TestChunk(t *testing.T) {
+	{
+		arr := []int{1, 2, 3, 4, 5, 6, 7, 8}
+		chunks := Chunk(arr, 1)
+		expected := [][]int{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
+		for i := range chunks {
+			AssertSliceEqual(t, expected[i], chunks[i], strconv.Itoa(i))
+		}
+	}
+	{
+		arr := []int{1, 2, 3, 4, 5, 6, 7, 8}
+		chunks := Chunk(arr, 4)
+		expected := [][]int{{1, 2, 3, 4}, {5, 6, 7, 8}}
+		for i := range chunks {
+			AssertSliceEqual(t, expected[i], chunks[i], strconv.Itoa(i))
+		}
+	}
+	{
+		arr := []int{1, 2, 3, 4, 5, 6, 7, 8}
+		chunks := Chunk(arr, 3)
+		expected := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8}}
+		for i := range chunks {
+			AssertSliceEqual(t, expected[i], chunks[i], strconv.Itoa(i))
+		}
+	}
+}
+
+func TestEqualBy(t *testing.T) {
+	{
+		a := []int{1, 2, 3, 4, 5}
+		b := []rune{'a', 'b', 'c', 'd', 'e'}
+		AssertTrue(t, EqualBy(a, b, func(aa int, bb rune) bool {
+			return (aa - 1) == int(bb-'a')
+		}))
+	}
+	{
+		a := []int{1, 2, 3, 4, 5}
+		b := []rune{'a', 'b', 'c', 'd', 'f'}
+		AssertFalse(t, EqualBy(a, b, func(aa int, bb rune) bool {
+			return (aa - 1) == int(bb-'a')
+		}))
 	}
 }

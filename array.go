@@ -76,7 +76,9 @@ func Shuffle[T any](array []T) {
 	}
 }
 
-// Equal returns true if two arrays are equal.
+// Equal returns true if two arrays are equal. Two arrays are considered equal
+// if both are nil, or if their lengths are equal and their elements are equal.
+// Elements are compared using == operator.
 // @example
 // gfn.Equal([]int{1, 2, 3}, []int{1, 2, 3})                    // true
 // gfn.Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"})  // false
@@ -86,6 +88,28 @@ func Equal[T comparable](a, b []T) bool {
 	}
 	for i, aa := range a {
 		if aa != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+/* @example EqualBy
+a := []int{1, 2, 3, 4, 5}
+b := []rune{'a', 'b', 'c', 'd', 'e'}
+EqualBy(a, b, func(aa int, bb rune) bool {
+	return (aa - 1) == int(bb-'a')
+}) // true
+*/
+
+// EqualBy returns true if two arrays are equal by comparing their elements
+// using the given function.
+func EqualBy[T1, T2 any](a []T1, b []T2, fn func(T1, T2) bool) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, aa := range a {
+		if !fn(aa, b[i]) {
 			return false
 		}
 	}
@@ -130,13 +154,38 @@ func IsSorted[T Int | Uint | Float | ~string](array []T) bool {
 	return true
 }
 
-// Distribution returns a map of values and their counts.
+// Counter returns a map of values and their counts.
 // @example
-// gfn.Distribution([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
-func Distribution[T comparable](array []T) map[T]int {
+// gfn.Counter([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
+func Counter[T comparable](array []T) map[T]int {
 	res := make(map[T]int)
 	for _, v := range array {
 		res[v]++
+	}
+	return res
+}
+
+/* @example CounterBy
+type Employee struct {
+	name       string
+	department string
+}
+employees := []Employee{
+	{"Alice", "Accounting"},
+	{"Dave", "Engineering"},
+	{"Eve", "Engineering"},
+}
+dist := CounterBy(employees, func(e Employee) string {
+	return e.department
+})  // map[string]int{"Accounting": 1, "Engineering": 2}
+*/
+
+// CounterBy returns a map of values and their counts. The values are
+// calculated by the given function.
+func CounterBy[T any, U comparable](array []T, fn func(T) U) map[U]int {
+	res := make(map[U]int)
+	for _, v := range array {
+		res[fn(v)]++
 	}
 	return res
 }
@@ -185,7 +234,8 @@ func Unzip[T, U any](n int, unzipFn func(i int) (T, U)) ([]T, []U) {
 	return a, b
 }
 
-// Sample returns a random sample of n elements from an array.
+// Sample returns a random sample of n elements from an array. Every position in
+// the array are at most selected once. n should be less or equal to len(array).
 // @example
 // gfn.Sample([]int{1, 2, 3, 4, 5}, 3)  // []int{3, 1, 5} or other random choices.
 func Sample[T any](array []T, n int) []T {
@@ -219,6 +269,37 @@ func Uniq[T comparable](array []T) []T {
 	return res
 }
 
+/* @example UniqBy
+type Employee struct {
+	name       string
+	department string
+}
+employees := []Employee{
+	{"Alice", "Accounting"},
+	{"Bob", "Accounting"},
+	{"Cindy", "Engineering"},
+	{"Dave", "Engineering"},
+}
+UniqBy(employees, func(e Employee) string {
+	return e.department
+})
+// []Employee{{"Alice", "Accounting"}, {"Cindy", "Engineering"}}
+*/
+
+// UniqBy returns an array with all duplicates removed by applying a function to each element.
+func UniqBy[T any, U comparable](array []T, fn func(T) U) []T {
+	res := []T{}
+	seen := make(map[U]struct{})
+	for _, v := range array {
+		value := fn(v)
+		if _, ok := seen[value]; !ok {
+			res = append(res, v)
+			seen[value] = struct{}{}
+		}
+	}
+	return res
+}
+
 // Union returns an array with all duplicates removed from multiple arrays.
 // @example
 // gfn.Union([]int{1, 2, 3}, []int{2, 3, 4}, []int{3, 4, 5})
@@ -231,6 +312,49 @@ func Union[T comparable](arrays ...[]T) []T {
 			if _, ok := seen[v]; !ok {
 				res = append(res, v)
 				seen[v] = struct{}{}
+			}
+		}
+	}
+	return res
+}
+
+/* @example UnionBy
+type Employee struct {
+	name       string
+	department string
+}
+group1 := []Employee{
+	{"Alice", "Accounting"},
+	{"Bob", "Accounting"},
+	{"Cindy", "Engineering"},
+}
+group2 := []Employee{
+	{"Alice", "Accounting"},
+	{"Cindy", "Engineering"},
+	{"Dave", "Engineering"},
+	{"Eve", "Engineering"},
+}
+UnionBy(func(e Employee) string { return e.name }, group1, group2)
+// []Employee{
+// 	{"Alice", "Accounting"},
+// 	{"Bob", "Accounting"},
+// 	{"Cindy", "Engineering"},
+// 	{"Dave", "Engineering"},
+// 	{"Eve", "Engineering"},
+// }
+*/
+
+// UnionBy returns an array with all duplicates removed from multiple arrays
+// by applying a function to each element.
+func UnionBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
+	res := []T{}
+	seen := make(map[U]struct{})
+	for _, array := range arrays {
+		for _, v := range array {
+			value := fn(v)
+			if _, ok := seen[value]; !ok {
+				res = append(res, v)
+				seen[value] = struct{}{}
 			}
 		}
 	}
@@ -267,12 +391,46 @@ func Diff[T comparable](array []T, others ...[]T) []T {
 	return res
 }
 
+/* @example DiffBy
+type Data struct {
+	value int
+}
+data1 := []Data{{1}, {3}, {2}, {4}, {5}, {2}}
+data2 := []Data{{3}, {4}, {5}}
+DiffBy(func(d Data) int { return d.value }, data1, data2)
+// []Data{{1}, {2}, {2}}
+*/
+
+// DiffBy returns a new array that is a copy of the original array,
+// removing all occurrences of any item that also appear in others.
+func DiffBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) []T {
+	res := make([]Pair[U, T], len(array))
+	for i, v := range array {
+		res[i] = Pair[U, T]{fn(v), v}
+	}
+	for _, other := range others {
+		seen := map[U]struct{}{}
+		for _, v := range other {
+			seen[fn(v)] = struct{}{}
+		}
+		res = Filter(res, func(p Pair[U, T]) bool {
+			_, ok := seen[p.First]
+			return !ok
+		})
+	}
+	return Map(res, func(p Pair[U, T]) T {
+		return p.Second
+	})
+}
+
 // Fill sets all elements of an array to a given value.
 // @example
 // array := make([]bool, 5)
 // Fill(array, true)
 // // []bool{true, true, true, true, true}
 //
+// // you can control the start index and end index of the array
+// // by using the slice
 // array2 := make([]int, 5)
 // Fill(array2[2:], 100)
 // // []int{0, 0, 100, 100, 100}
@@ -283,10 +441,39 @@ func Fill[T any](array []T, value T) {
 }
 
 // Count returns the number of occurrences of a value in an array.
+// @example
+// gfn.Count([]int{1, 2, 2, 2, 5, 6}, 2)  // 3
 func Count[T comparable](array []T, value T) int {
 	res := 0
 	for _, v := range array {
 		if v == value {
+			res++
+		}
+	}
+	return res
+}
+
+/* @example CountBy
+type Employee struct {
+	name       string
+	department string
+}
+employees := []Employee{
+	{"Alice", "Accounting"},
+	{"Cindy", "Engineering"},
+	{"Dave", "Engineering"},
+	{"Eve", "Engineering"},
+}
+CountBy(employees, func(e Employee) bool {
+	return e.department == "Engineering"
+})  // 3
+*/
+
+// CountBy returns the number of elements in an array that satisfy a predicate.
+func CountBy[T any](array []T, fn func(T) bool) int {
+	res := 0
+	for _, v := range array {
+		if fn(v) {
 			res++
 		}
 	}
@@ -402,7 +589,15 @@ func Concat[T any](arrays ...[]T) []T {
 	return res
 }
 
+/* @example Find
+value, index := Find([]string{"a", "ab", "abc"}, func(s string) bool {
+	return len(s) > 1
+})
+// "ab", 1
+*/
+
 // Find returns the first element in an array that passes a given test and corresponding index.
+// Index of -1 is returned if no element passes the test.
 func Find[T any](array []T, fn func(T) bool) (T, int) {
 	for i, v := range array {
 		if fn(v) {
@@ -413,7 +608,15 @@ func Find[T any](array []T, fn func(T) bool) (T, int) {
 	return res, -1
 }
 
+/* @example FindLast
+value, index := FindLast([]string{"a", "ab", "abc"}, func(s string) bool {
+	return len(s) > 1
+})
+// "abc", 2
+*/
+
 // FindLast returns the last element in an array that passes a given test and corresponding index.
+// Index of -1 is returned if no element passes the test.
 func FindLast[T any](array []T, fn func(T) bool) (T, int) {
 	for i := len(array) - 1; i >= 0; i-- {
 		if fn(array[i]) {
@@ -422,4 +625,140 @@ func FindLast[T any](array []T, fn func(T) bool) (T, int) {
 	}
 	var res T
 	return res, -1
+}
+
+// Remove removes all elements from an array that equal to given values.
+// @example
+// gfn.Remove([]int{1, 2, 3, 4, 2, 3, 2, 3}, 2, 3)  // []int{1, 4}
+func Remove[T comparable](array []T, values ...T) []T {
+	res := []T{}
+	valueSet := ToSet(values)
+	for _, v := range array {
+		_, ok := valueSet[v]
+		if !ok {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
+// Intersect returns a new array that is the intersection of two or more arrays.
+// @example
+// arr1 := []int{1, 2, 3, 4, 5}
+// arr2 := []int{2, 3, 4, 5, 6}
+// arr3 := []int{5, 4, 3, 2}
+// arr4 := []int{2, 3}
+// Intersect(arr1, arr2, arr3, arr4)  // []int{2, 3}
+func Intersect[T comparable](arrays ...[]T) []T {
+	if len(arrays) <= 1 {
+		panic("requires at least 2 arrays")
+	}
+
+	res := Uniq(arrays[0])
+	for _, arr := range arrays[1:] {
+		set := ToSet(arr)
+		res = Filter(res, func(v T) bool {
+			_, ok := set[v]
+			return ok
+		})
+	}
+	return res
+}
+
+/* @example IntersectBy
+type Data struct {
+	value int
+}
+data1 := []Data{{1}, {3}, {2}, {4}, {5}}
+data2 := []Data{{2}, {3}}
+IntersectBy(func(d Data) int { return d.value }, data1, data2)
+// []Data{{3}, {2}}
+*/
+
+// IntersectBy returns a new array that is the intersection of two or more arrays,
+// computed with a given function.
+func IntersectBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
+	if len(arrays) <= 1 {
+		panic("requires at least 2 arrays")
+	}
+	// make unique pair of array[0]
+	var res []Pair[U, T]
+	seen := map[U]struct{}{}
+	for _, v := range arrays[0] {
+		key := fn(v)
+		if _, ok := seen[key]; !ok {
+			res = append(res, Pair[U, T]{key, v})
+			seen[key] = struct{}{}
+		}
+	}
+	// filter by seen
+	for _, arr := range arrays[1:] {
+		seen = map[U]struct{}{}
+		for _, v := range arr {
+			seen[fn(v)] = struct{}{}
+		}
+		res = Filter(res, func(p Pair[U, T]) bool {
+			_, ok := seen[p.First]
+			return ok
+		})
+	}
+	return Map(res, func(p Pair[U, T]) T {
+		return p.Second
+	})
+}
+
+// Repeat returns a new array that is the result of repeating an array
+// a given number of times.
+// @example
+// gfn.Repeat([]int{1, 2, 3}, 3)  // []int{1, 2, 3, 1, 2, 3, 1, 2, 3}
+func Repeat[T any](array []T, repeat int) []T {
+	if repeat < 0 {
+		panic("repeat must be greater or equal to 0")
+	}
+	if repeat == 0 {
+		return []T{}
+	}
+	if repeat == 1 {
+		return Copy(array)
+	}
+
+	res := make([]T, len(array)*repeat)
+	for i := 0; i < repeat; i++ {
+		copy(res[i*len(array):], array)
+	}
+	return res
+}
+
+/* @example ForEach
+sum := 0
+ForEach([]int{1, 2, 3}, func(i int) {
+	sum += i
+})
+// sum == 6
+*/
+
+// ForEach executes a provided function once for each array element.
+func ForEach[T any](array []T, fn func(value T)) {
+	for _, v := range array {
+		fn(v)
+	}
+}
+
+// Chunk splits an array into chunks of given size.
+// @example
+// gfn.Chunk([]int{1, 2, 3, 4, 5}, 2)  // [][]int{{1, 2}, {3, 4}, {5}}
+func Chunk[T any](array []T, size int) [][]T {
+	if size <= 0 {
+		panic("size must be greater than 0")
+	}
+
+	var res [][]T
+	for i := 0; i < len(array); i += size {
+		end := i + size
+		if end > len(array) {
+			end = len(array)
+		}
+		res = append(res, array[i:end])
+	}
+	return res
 }
