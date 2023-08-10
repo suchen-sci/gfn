@@ -54,3 +54,25 @@ func TestFilter(t *testing.T) {
 		}))
 	}
 }
+
+func TestReduce(t *testing.T) {
+	AssertEqual(t, 6, Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
+		return a + b
+	}))
+}
+
+func TestFilterKV(t *testing.T) {
+	m := map[int]string{1: "a", 2: "b", 3: "c"}
+	m = FilterKV(m, func(k int, v string) bool {
+		return k == 1 || v == "c"
+	})
+	AssertMapEqual(t, map[int]string{1: "a", 3: "c"}, m)
+}
+
+func TestReduceKV(t *testing.T) {
+	m := map[string]int{"a": 1, "b": 2, "c": 3}
+	total := ReduceKV(m, 0, func(value int, k string, v int) int {
+		return value + v
+	})
+	AssertEqual(t, 6, total)
+}
