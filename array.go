@@ -175,7 +175,7 @@ employees := []Employee{
 	{"Dave", "Engineering"},
 	{"Eve", "Engineering"},
 }
-dist := CounterBy(employees, func(e Employee) string {
+dist := gfn.CounterBy(employees, func(e Employee) string {
 	return e.department
 })  // map[string]int{"Accounting": 1, "Engineering": 2}
 */
@@ -280,7 +280,7 @@ employees := []Employee{
 	{"Cindy", "Engineering"},
 	{"Dave", "Engineering"},
 }
-UniqBy(employees, func(e Employee) string {
+gfn.UniqBy(employees, func(e Employee) string {
 	return e.department
 })
 // []Employee{{"Alice", "Accounting"}, {"Cindy", "Engineering"}}
@@ -334,7 +334,7 @@ group2 := []Employee{
 	{"Dave", "Engineering"},
 	{"Eve", "Engineering"},
 }
-UnionBy(func(e Employee) string { return e.name }, group1, group2)
+gfn.UnionBy(func(e Employee) string { return e.name }, group1, group2)
 // []Employee{
 // 	{"Alice", "Accounting"},
 // 	{"Bob", "Accounting"},
@@ -374,12 +374,12 @@ func Copy[T any](array []T) []T {
 	return res
 }
 
-// Diff returns a new array that is a copy of the original array,
+// Difference returns a new array that is a copy of the original array,
 // removing all occurrences of any item that also appear in others.
 // The order is preserved from the original array.
 // @example
-// gfn.Diff([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
-func Diff[T comparable](array []T, others ...[]T) []T {
+// gfn.Difference([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
+func Difference[T comparable](array []T, others ...[]T) []T {
 	res := Copy(array)
 	for _, other := range others {
 		m := ToSet(other)
@@ -391,19 +391,19 @@ func Diff[T comparable](array []T, others ...[]T) []T {
 	return res
 }
 
-/* @example DiffBy
+/* @example DifferenceBy
 type Data struct {
 	value int
 }
 data1 := []Data{{1}, {3}, {2}, {4}, {5}, {2}}
 data2 := []Data{{3}, {4}, {5}}
-DiffBy(func(d Data) int { return d.value }, data1, data2)
+gfn.DifferenceBy(func(d Data) int { return d.value }, data1, data2)
 // []Data{{1}, {2}, {2}}
 */
 
-// DiffBy returns a new array that is a copy of the original array,
+// DifferenceBy returns a new array that is a copy of the original array,
 // removing all occurrences of any item that also appear in others.
-func DiffBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) []T {
+func DifferenceBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) []T {
 	res := make([]Pair[U, T], len(array))
 	for i, v := range array {
 		res[i] = Pair[U, T]{fn(v), v}
@@ -426,13 +426,13 @@ func DiffBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) []T {
 // Fill sets all elements of an array to a given value.
 // @example
 // array := make([]bool, 5)
-// Fill(array, true)
+// gfn.Fill(array, true)
 // // []bool{true, true, true, true, true}
 //
 // // you can control the start index and end index of the array
 // // by using the slice
 // array2 := make([]int, 5)
-// Fill(array2[2:], 100)
+// gfn.Fill(array2[2:], 100)
 // // []int{0, 0, 100, 100, 100}
 func Fill[T any](array []T, value T) {
 	for i := range array {
@@ -590,7 +590,7 @@ func Concat[T any](arrays ...[]T) []T {
 }
 
 /* @example Find
-value, index := Find([]string{"a", "ab", "abc"}, func(s string) bool {
+value, index := gfn.Find([]string{"a", "ab", "abc"}, func(s string) bool {
 	return len(s) > 1
 })
 // "ab", 1
@@ -609,7 +609,7 @@ func Find[T any](array []T, fn func(T) bool) (T, int) {
 }
 
 /* @example FindLast
-value, index := FindLast([]string{"a", "ab", "abc"}, func(s string) bool {
+value, index := gfn.FindLast([]string{"a", "ab", "abc"}, func(s string) bool {
 	return len(s) > 1
 })
 // "abc", 2
@@ -642,14 +642,14 @@ func Remove[T comparable](array []T, values ...T) []T {
 	return res
 }
 
-// Intersect returns a new array that is the intersection of two or more arrays.
+// Intersection returns a new array that is the intersection of two or more arrays.
 // @example
 // arr1 := []int{1, 2, 3, 4, 5}
 // arr2 := []int{2, 3, 4, 5, 6}
 // arr3 := []int{5, 4, 3, 2}
 // arr4 := []int{2, 3}
-// Intersect(arr1, arr2, arr3, arr4)  // []int{2, 3}
-func Intersect[T comparable](arrays ...[]T) []T {
+// gfn.Intersection(arr1, arr2, arr3, arr4)  // []int{2, 3}
+func Intersection[T comparable](arrays ...[]T) []T {
 	if len(arrays) <= 1 {
 		panic("requires at least 2 arrays")
 	}
@@ -665,19 +665,19 @@ func Intersect[T comparable](arrays ...[]T) []T {
 	return res
 }
 
-/* @example IntersectBy
+/* @example IntersectionBy
 type Data struct {
 	value int
 }
 data1 := []Data{{1}, {3}, {2}, {4}, {5}}
 data2 := []Data{{2}, {3}}
-IntersectBy(func(d Data) int { return d.value }, data1, data2)
+gfn.IntersectionBy(func(d Data) int { return d.value }, data1, data2)
 // []Data{{3}, {2}}
 */
 
-// IntersectBy returns a new array that is the intersection of two or more arrays,
+// IntersectionBy returns a new array that is the intersection of two or more arrays,
 // computed with a given function.
-func IntersectBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
+func IntersectionBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
 	if len(arrays) <= 1 {
 		panic("requires at least 2 arrays")
 	}
@@ -731,7 +731,7 @@ func Repeat[T any](array []T, repeat int) []T {
 
 /* @example ForEach
 sum := 0
-ForEach([]int{1, 2, 3}, func(i int) {
+gfn.ForEach([]int{1, 2, 3}, func(i int) {
 	sum += i
 })
 // sum == 6

@@ -257,7 +257,7 @@ func TestDiff(t *testing.T) {
 	a := []int{1, 2, 3, 4, 5, 6, 7}
 	b := []int{2, 4, 6}
 	c := []int{1, 3, 5, 7}
-	AssertSliceEqual(t, c, Diff(a, b))
+	AssertSliceEqual(t, c, Difference(a, b))
 
 	for i := 0; i < 100; i++ {
 		a := Range(i, i+200)
@@ -267,7 +267,7 @@ func TestDiff(t *testing.T) {
 		Shuffle(b)
 		Shuffle(c)
 
-		d := Diff(a, b, c)
+		d := Difference(a, b, c)
 		sort.Ints(d)
 		AssertSliceEqual(t, Range(i, i+50), d)
 	}
@@ -408,21 +408,21 @@ func TestIntersect(t *testing.T) {
 		arr2 := []int{2, 3, 4, 5, 6}
 		arr3 := []int{5, 4, 3, 2}
 		arr4 := []int{2, 3}
-		AssertSliceEqual(t, []int{2, 3}, Intersect(arr1, arr2, arr3, arr4))
+		AssertSliceEqual(t, []int{2, 3}, Intersection(arr1, arr2, arr3, arr4))
 	}
 	{
 		arr1 := []int{1, 2, 3, 4, 5, 4, 3, 2, 1}
 		arr2 := []int{2, 3, 4, 5, 6, 2, 3, 2, 3}
 		arr3 := []int{5, 4, 3, 2, 2, 3}
 		arr4 := []int{2, 3, 2, 3, 2, 3}
-		AssertSliceEqual(t, []int{2, 3}, Intersect(arr1, arr2, arr3, arr4))
+		AssertSliceEqual(t, []int{2, 3}, Intersection(arr1, arr2, arr3, arr4))
 	}
 
 	AssertPanics(t, func() {
-		Intersect[int]()
+		Intersection[int]()
 	})
 	AssertPanics(t, func() {
-		Intersect([]int{1, 2, 3})
+		Intersection([]int{1, 2, 3})
 	})
 }
 
@@ -538,7 +538,7 @@ func TestIntersectBy(t *testing.T) {
 	data2 := []Data{{2}, {3}, {4}, {5}, {6}}
 	data3 := []Data{{5}, {4}, {3}, {2}}
 	data4 := []Data{{2}, {3}}
-	intersect := IntersectBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
+	intersect := IntersectionBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
 	expected := []Data{{3}, {2}}
 	AssertSliceEqual(t, expected, intersect)
 }
@@ -551,7 +551,7 @@ func TestDiffBy(t *testing.T) {
 	data2 := []Data{{3}, {4}, {5}, {6}}
 	data3 := []Data{{5}, {4}, {3}}
 	data4 := []Data{{3}, {4}}
-	intersect := DiffBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
+	intersect := DifferenceBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
 	expected := []Data{{1}, {2}, {2}}
 	AssertSliceEqual(t, expected, intersect)
 }
