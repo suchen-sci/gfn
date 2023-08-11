@@ -18,7 +18,7 @@ jobs:
       - name: Generate README.md
         run: make doc
 
-      - name: Compare files
+      - name: Compare README.md
         run: |
           diff README.md README.md.bak
           if [ $? -ne 0 ]; then
