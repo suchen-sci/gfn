@@ -109,7 +109,7 @@ func Clear[K comparable, V any](m map[K]V) {
 m := map[int]string{1: "a", 2: "b", 3: "c"}
 
 gfn.Items(m)
-// []Pair[int, string]{
+// []gfn.Pair[int, string]{
 // 	{1, "a"},
 // 	{2, "b"},
 // 	{3, "c"},

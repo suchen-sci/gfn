@@ -258,7 +258,7 @@ employees := []Employee{
     {"Dave", "Engineering"},
     {"Eve", "Engineering"},
 }
-CountBy(employees, func(e Employee) bool {
+gfn.CountBy(employees, func(e Employee) bool {
     return e.department == "Engineering"
 })  // 3
 ```
@@ -293,7 +293,7 @@ employees := []Employee{
     {"Dave", "Engineering"},
     {"Eve", "Engineering"},
 }
-dist := gfn.CounterBy(employees, func(e Employee) string {
+gfn.CounterBy(employees, func(e Employee) string {
     return e.department
 })  // map[string]int{"Accounting": 1, "Engineering": 2}
 ```
@@ -352,7 +352,7 @@ EqualBy returns true if two arrays are equal by comparing their elements using t
 ```go
 a := []int{1, 2, 3, 4, 5}
 b := []rune{'a', 'b', 'c', 'd', 'e'}
-EqualBy(a, b, func(aa int, bb rune) bool {
+gfn.EqualBy(a, b, func(aa int, bb rune) bool {
     return (aa - 1) == int(bb-'a')
 }) // true
 ```
@@ -433,7 +433,7 @@ GroupBy generate a map of arrays by grouping the elements of an array according 
 #### Example:
 ```go
 array := []int{1, 2, 3, 4, 5, 6, 7, 8}
-groups := GroupBy(array, func(i int) string {
+groups := gfn.GroupBy(array, func(i int) string {
     if i%2 == 0 {
         return "even"
     }
@@ -1042,7 +1042,7 @@ Items returns a slice of pairs of keys and values.
 m := map[int]string{1: "a", 2: "b", 3: "c"}
 
 gfn.Items(m)
-// []Pair[int, string]{
+// []gfn.Pair[int, string]{
 //     {1, "a"},
 //     {2, "b"},
 //     {3, "c"},

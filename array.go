@@ -97,7 +97,7 @@ func Equal[T comparable](a, b []T) bool {
 /* @example EqualBy
 a := []int{1, 2, 3, 4, 5}
 b := []rune{'a', 'b', 'c', 'd', 'e'}
-EqualBy(a, b, func(aa int, bb rune) bool {
+gfn.EqualBy(a, b, func(aa int, bb rune) bool {
 	return (aa - 1) == int(bb-'a')
 }) // true
 */
@@ -175,7 +175,7 @@ employees := []Employee{
 	{"Dave", "Engineering"},
 	{"Eve", "Engineering"},
 }
-dist := gfn.CounterBy(employees, func(e Employee) string {
+gfn.CounterBy(employees, func(e Employee) string {
 	return e.department
 })  // map[string]int{"Accounting": 1, "Engineering": 2}
 */
@@ -464,7 +464,7 @@ employees := []Employee{
 	{"Dave", "Engineering"},
 	{"Eve", "Engineering"},
 }
-CountBy(employees, func(e Employee) bool {
+gfn.CountBy(employees, func(e Employee) bool {
 	return e.department == "Engineering"
 })  // 3
 */
@@ -482,7 +482,7 @@ func CountBy[T any](array []T, fn func(T) bool) int {
 
 /* @example GroupBy
 array := []int{1, 2, 3, 4, 5, 6, 7, 8}
-groups := GroupBy(array, func(i int) string {
+groups := gfn.GroupBy(array, func(i int) string {
 	if i%2 == 0 {
 		return "even"
 	}
