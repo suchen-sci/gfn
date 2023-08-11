@@ -1,6 +1,7 @@
 package gfn_test
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"testing"
@@ -8,7 +9,7 @@ import (
 	. "github.com/suchen-sci/gfn"
 )
 
-func TestCompare(t *testing.T) {
+func TestEqualKV(t *testing.T) {
 	{
 		type Number int
 		type Numbers map[Number]struct{}
@@ -18,10 +19,10 @@ func TestCompare(t *testing.T) {
 			map1[Number(i)] = struct{}{}
 			map2[Number(i)] = struct{}{}
 		}
-		AssertTrue(t, Compare(map1, map2))
+		AssertMapEqual(t, map1, map2)
 
 		map2[100] = struct{}{}
-		AssertFalse(t, Compare(map1, map2))
+		AssertFalse(t, EqualKV(map1, map2))
 	}
 
 	{
@@ -31,10 +32,10 @@ func TestCompare(t *testing.T) {
 			map1[i] = strconv.Itoa(i)
 			map2[i] = strconv.Itoa(i)
 		}
-		AssertTrue(t, Compare(map1, map2))
+		AssertMapEqual(t, map1, map2)
 
 		map2[0] = "999"
-		AssertFalse(t, Compare(map1, map2))
+		AssertFalse(t, EqualKV(map1, map2))
 	}
 }
 
@@ -76,7 +77,7 @@ func TestInvert(t *testing.T) {
 			"set.go":   "Set",
 			"math.go":  "Math",
 		}
-		AssertTrue(t, Compare(expected, Invert(m)))
+		AssertMapEqual(t, expected, Invert(m))
 	}
 
 	{
@@ -90,7 +91,7 @@ func TestInvert(t *testing.T) {
 			2: "b",
 			3: "c",
 		}
-		AssertTrue(t, Compare(expected, Invert(m)))
+		AssertMapEqual(t, expected, Invert(m))
 	}
 }
 
@@ -122,15 +123,15 @@ func TestUpdate(t *testing.T) {
 	m3 := map[int]string{1: "f"}
 	expected := map[int]string{1: "f", 2: "e", 3: "c"}
 	Update(m1, m2, m3)
-	AssertTrue(t, Compare(expected, m1))
+	AssertMapEqual(t, expected, m1)
 }
 
 func TestClone(t *testing.T) {
 	m := map[int]string{1: "a", 2: "b", 3: "c"}
 	clone := Clone(m)
-	AssertTrue(t, Compare(m, clone))
+	AssertMapEqual(t, m, clone)
 	m[1] = "d"
-	AssertFalse(t, Compare(m, clone))
+	AssertFalse(t, EqualKV(m, clone))
 }
 
 func TestDeleteBy(t *testing.T) {
@@ -138,13 +139,88 @@ func TestDeleteBy(t *testing.T) {
 	DeleteBy(m, func(k int, v string) bool {
 		return k == 1 || v == "c"
 	})
-	AssertTrue(t, Compare(map[int]string{2: "b"}, m))
+	AssertMapEqual(t, map[int]string{2: "b"}, m)
 }
 
-func TestRejected(t *testing.T) {
+func TestSelect(t *testing.T) {
 	m := map[int]string{1: "a", 2: "b", 3: "c"}
-	rejected := Rejected(m, func(k int, v string) bool {
+	rejected := Select(m, func(k int, v string) bool {
 		return k == 1 || v == "c"
 	})
-	AssertTrue(t, Compare(map[int]string{2: "b"}, rejected))
+	AssertMapEqual(t, map[int]string{1: "a", 3: "c"}, rejected)
+}
+
+func TestIsDisjoint(t *testing.T) {
+	{
+		m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+		m2 := map[int]int{4: 4, 5: 5, 6: 6}
+		AssertTrue(t, IsDisjoint(m1, m2))
+	}
+	{
+		m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+		m2 := map[int]string{1: "a", 2: "b"}
+		AssertFalse(t, IsDisjoint(m1, m2))
+	}
+	{
+		m1 := map[int]struct{}{1: {}, 2: {}, 3: {}}
+		m2 := map[int]struct{}{4: {}, 5: {}, 6: {}}
+		AssertTrue(t, IsDisjoint(m1, m2))
+	}
+}
+
+func TestIntersectKeys(t *testing.T) {
+	m1 := map[int]string{1: "a", 2: "b", 3: "c", 4: "d"}
+	m2 := map[int]string{1: "a", 2: "b"}
+	m3 := map[int]string{2: "b", 3: "c", 4: "d"}
+	keys := IntersectKeys(m1, m2, m3)
+	AssertSliceEqual(t, []int{2}, keys)
+}
+
+func TestDifferentKeys(t *testing.T) {
+	m1 := map[int]string{1: "a", 2: "b", 3: "c", 4: "d"}
+	m2 := map[int]string{1: "a", 2: "b"}
+	m3 := map[int]string{2: "b", 3: "c"}
+	keys := DifferentKeys(m1, m2, m3)
+	AssertSliceEqual(t, []int{4}, keys)
+}
+
+func TestGetOrDefault(t *testing.T) {
+	m := map[int]string{1: "a", 2: "b", 3: "c"}
+	AssertEqual(t, "a", GetOrDefault(m, 1, "d"))
+	AssertEqual(t, "d", GetOrDefault(m, 4, "d"))
+}
+
+func TestEqualKVBy(t *testing.T) {
+	{
+		m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+		m2 := map[int]string{1: "e", 2: "f", 3: "g"}
+		AssertTrue(t, EqualKVBy(m1, m2, func(k int, a, b string) bool {
+			return len(a) == len(b)
+		}))
+	}
+	{
+		m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+		m2 := map[int]string{1: "e", 2: "f", 3: "g"}
+		AssertFalse(t, EqualKVBy(m1, m2, func(k int, a, b string) bool {
+			return a == b
+		}))
+	}
+
+}
+
+func TestForEachKV(t *testing.T) {
+	arr := []string{}
+	m := map[int]string{1: "a", 2: "b", 3: "c"}
+	ForEachKV(m, func(k int, v string) {
+		arr = append(arr, fmt.Sprintf("%d:%s", k, v))
+	})
+	sort.Strings(arr)
+	AssertSliceEqual(t, []string{"1:a", "2:b", "3:c"}, arr)
+}
+
+func TestToKV(t *testing.T) {
+	m := ToKV(3, func(i int) (int, string) {
+		return i, strconv.Itoa(i)
+	})
+	AssertMapEqual(t, map[int]string{0: "0", 1: "1", 2: "2"}, m)
 }

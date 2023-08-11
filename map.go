@@ -1,17 +1,39 @@
 package gfn
 
-// Compare returns true if two maps/sets are equal.
+// EqualKV returns true if two maps/sets are equal.
 // @example
 // map1 := map[int]struct{}{1: {}, 2: {}, 3: {}}
 // map2 := map[int]struct{}{1: {}, 2: {}, 3: {}}
-// Compare(map1, map2) // true
-func Compare[K, V comparable](a map[K]V, b map[K]V) bool {
+// gfn.EqualKV(map1, map2) // true
+func EqualKV[K, V comparable](a map[K]V, b map[K]V) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
 	for k, v := range a {
 		if v2, ok := b[k]; !ok || v != v2 {
+			return false
+		}
+	}
+	return true
+}
+
+/* @example EqualKVBy
+m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+m2 := map[int]string{1: "e", 2: "f", 3: "g"}
+gfn.EqualKVBy(m1, m2, func(k int, a, b string) bool {
+	return len(a) == len(b)
+}) // true
+*/
+
+// EqualKVBy returns true if two maps/sets are equal by a custom function.
+func EqualKVBy[K comparable, V1, V2 any](a map[K]V1, b map[K]V2, fn func(K, V1, V2) bool) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for k, v := range a {
+		if v2, ok := b[k]; !ok || !fn(k, v, v2) {
 			return false
 		}
 	}
@@ -105,12 +127,21 @@ func Items[K comparable, V any](m map[K]V) []Pair[K, V] {
 	return items
 }
 
+/* @example Update
+// use Update to do union of maps
+m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+m2 := map[int]string{4: "d", 5: "e"}
+union := map[int]string{}
+gfn.Update(union, m1, m2)
+// union: map[int]string{1: "a", 2: "b", 3: "c", 4: "d", 5: "e"}
+*/
+
 // Update updates a map with the keys and values from other maps.
 // @example
 // m1 := map[int]string{1: "a", 2: "b", 3: "c"}
 // m2 := map[int]string{1: "d", 2: "e"}
 // m3 := map[int]string{1: "f"}
-// Update(m1, m2, m3)
+// gfn.Update(m1, m2, m3)
 // // map[int]string{1: "f", 2: "e", 3: "c"}
 func Update[K comparable, V any](m map[K]V, other ...map[K]V) {
 	for _, o := range other {
@@ -123,7 +154,7 @@ func Update[K comparable, V any](m map[K]V, other ...map[K]V) {
 // Clone returns a shallow copy of a map.
 // @example
 // m := map[int]string{1: "a", 2: "b", 3: "c"}
-// m2 := Clone(m)
+// m2 := gfn.Clone(m)
 // // m2 is a copy of m
 func Clone[K comparable, V any](m map[K]V) map[K]V {
 	res := make(map[K]V, len(m))
@@ -135,7 +166,7 @@ func Clone[K comparable, V any](m map[K]V) map[K]V {
 
 /* @example DeleteBy
 m := map[int]string{1: "a", 2: "b", 3: "c"}
-DeleteBy(m, func(k int, v string) bool {
+gfn.DeleteBy(m, func(k int, v string) bool {
 	return k == 1 || v == "c"
 })
 // map[int]string{2: "b"}
@@ -150,21 +181,150 @@ func DeleteBy[K comparable, V any](m map[K]V, deleteFn func(K, V) bool) {
 	}
 }
 
-/* @example Rejected
+/* @example Select
 m := map[int]string{1: "a", 2: "b", 3: "c"}
-rejected := Rejected(m, func(k int, v string) bool {
+gfn.Select(m, func(k int, v string) bool {
 	return k == 1 || v == "c"
 })
-// map[int]string{2: "b"}
+// map[int]string{1: "a", 3: "c"}
 */
 
-// Rejected returns a map with keys and values that don't pass the predicate function.
-func Rejected[K comparable, V any](m map[K]V, keep func(K, V) bool) map[K]V {
+// Select returns a map with keys and values that satisfy the predicate function.
+func Select[K comparable, V any](m map[K]V, fn func(K, V) bool) map[K]V {
 	res := make(map[K]V)
 	for k, v := range m {
-		if !keep(k, v) {
+		if fn(k, v) {
 			res[k] = v
 		}
 	}
 	return res
+}
+
+// IsDisjoint returns true if the maps have no keys in common. It usually
+// used to check if two sets are disjoint.
+// @example
+// m1 := map[int]string{1: "a", 2: "b", 3: "c"}
+// m2 := map[int]int{4: 4, 5: 5, 6: 6}
+// IsDisjoint(m1, m2)  // true
+//
+// m3 := map[int]struct{}{1: {}, 2: {}, 3: {}}
+// m4 := map[int]struct{}{4: {}, 5: {}, 6: {}}
+// gfn.IsDisjoint(m3, m4)  // true
+func IsDisjoint[K comparable, V1 any, V2 any](m1 map[K]V1, m2 map[K]V2) bool {
+	if len(m1) != len(m2) {
+		return false
+	}
+	for k1 := range m1 {
+		if _, ok := m2[k1]; ok {
+			return false
+		}
+	}
+	return true
+}
+
+// IntersectKeys returns a slice of keys that are in all maps. It usually
+// used to find the intersection of two or more sets.
+// @example
+// m1 := map[int]string{1: "a", 2: "b", 3: "c", 4: "d"}
+// m2 := map[int]string{1: "a", 2: "b"}
+// m3 := map[int]string{2: "b", 3: "c", 4: "d"}
+// gfn.IntersectKeys(m1, m2, m3)  // []int{2}
+func IntersectKeys[K comparable, V any](ms ...map[K]V) []K {
+	if len(ms) == 0 {
+		return nil
+	}
+	if len(ms) == 1 {
+		return Keys(ms[0])
+	}
+
+	res := Keys(ms[0])
+	for _, m := range ms[1:] {
+		res = Filter(res, func(k K) bool {
+			_, ok := m[k]
+			return ok
+		})
+	}
+	return res
+}
+
+// DifferentKeys returns a slice of keys that are in the first map but not in the others,
+// only keys in the map are considered, not values. It usually used to find the
+// difference between two or more sets.
+// @example
+// m1 := map[int]string{1: "a", 2: "b", 3: "c", 4: "d"}
+// m2 := map[int]string{1: "a", 2: "b"}
+// m3 := map[int]string{2: "b", 3: "c"}
+// gfn.DifferentKeys(m1, m2, m3)  // []int{4}
+func DifferentKeys[K comparable, V any](ms ...map[K]V) []K {
+	if len(ms) == 0 {
+		return nil
+	}
+	if len(ms) == 1 {
+		return Keys(ms[0])
+	}
+
+	res := Keys(ms[0])
+	for _, m := range ms[1:] {
+		res = Filter(res, func(k K) bool {
+			_, ok := m[k]
+			return !ok
+		})
+	}
+	return res
+}
+
+// GetOrDefault returns the value for a key if it exists, otherwise it returns the default value.
+// @example
+// m := map[int]string{1: "a", 2: "b", 3: "c"}
+// gfn.GetOrDefault(m, 1, "d")  // "a"
+// gfn.GetOrDefault(m, 4, "d")  // "d"
+func GetOrDefault[K comparable, V any](m map[K]V, key K, defaultValue V) V {
+	value, ok := m[key]
+	if ok {
+		return value
+	}
+	return defaultValue
+}
+
+/* @example ForEachKV
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+array := make([]int, 0, len(m))
+gfn.ForEachKV(m, func(k int, v string) {
+	array = append(array, k)
+}
+// array is []int{1, 2, 3} or other order
+
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+invert := map[string]int{}
+gfn.ForEachKV(m, func(k int, v string) {
+	invert[v] = k
+}
+// invert is map[string]int{"a": 1, "b": 2, "c": 3}
+*/
+
+// ForEachKV iterates over a map and calls a function for each key/value pair.
+func ForEachKV[K comparable, V any](m map[K]V, fn func(K, V)) {
+	for k, v := range m {
+		fn(k, v)
+	}
+}
+
+/* @example ToKV
+gfn.ToKV(3, func(i int) (int, string) {
+	return i, strconv.Itoa(i)
+})
+// map[int]string{0: "0", 1: "1", 2: "2"}
+*/
+
+// ToKV converts a slice to a map using a function to generate the keys and values.
+func ToKV[K comparable, V any](n int, fn func(int) (K, V)) map[K]V {
+	if n < 0 {
+		panic("n must be greater than or equal to zero")
+	}
+	m := make(map[K]V, n)
+	for i := 0; i < n; i++ {
+		k, v := fn(i)
+		m[k] = v
+	}
+	return m
 }

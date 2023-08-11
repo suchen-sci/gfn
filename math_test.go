@@ -256,3 +256,71 @@ func TestDivMod(t *testing.T) {
 		DivMod(1, 0)
 	})
 }
+
+func TestSumBy(t *testing.T) {
+	type Product struct {
+		name   string
+		amount int
+	}
+	products := []Product{
+		{"apple", 10},
+		{"banana", 20},
+		{"orange", 30},
+	}
+	AssertEqual(t, 60, SumBy(products, func(p Product) int {
+		return p.amount
+	}))
+}
+
+func TestMaxBy(t *testing.T) {
+	type Product struct {
+		name   string
+		amount int
+	}
+	products := []Product{
+		{"apple", 10},
+		{"banana", 20},
+		{"orange", 30},
+	}
+	p := MaxBy(products, func(p Product) int {
+		return p.amount
+	})
+	AssertEqual(t, "orange", p.name)
+}
+
+func TestMinBy(t *testing.T) {
+	type Product struct {
+		name   string
+		amount int
+	}
+	products := []Product{
+		{"apple", 10},
+		{"banana", 20},
+		{"orange", 30},
+	}
+	p := MinBy(products, func(p Product) int {
+		return p.amount
+	})
+	AssertEqual(t, "apple", p.name)
+}
+
+func TestMean(t *testing.T) {
+	AssertFloatEqual(t, 2.5, Mean([]int{1, 2, 3, 4}...), "int")
+	AssertFloatEqual(t, 3.0, Mean([]float64{1.5, 2.5, 3.5, 4.5}...), "int")
+}
+
+func TestMeanBy(t *testing.T) {
+	type Product struct {
+		name string
+		cost float64
+	}
+	products := []Product{
+		{"apple", 1.5},
+		{"banana", 2.5},
+		{"orange", 3.5},
+		{"lemon", 4.5},
+	}
+	AssertFloatEqual(t, 3.0, MeanBy(products, func(p Product) float64 {
+		return p.cost
+	}))
+}
