@@ -1,0 +1,29 @@
+name: Check File Difference
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  check-difference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Copy README.md
+        run: cp README.md README.md.bak
+      
+      - name: Generate README.md
+        run: make doc
+
+      - name: Compare files
+        run: |
+          diff README.md README.md.bak
+          if [ $? -ne 0 ]; then
+            echo "Files are different!"
+            exit 1
+          else
+            echo "Files are identical!"
+          fi
