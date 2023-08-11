@@ -1,4 +1,4 @@
-name: Check File Difference
+name: Document
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
 
       - name: Copy README.md
         run: cp README.md README.md.bak
-      
+
       - name: Generate README.md
         run: make doc
 
@@ -22,8 +22,8 @@ jobs:
         run: |
           diff README.md README.md.bak
           if [ $? -ne 0 ]; then
-            echo "Files are different!"
+            echo "README.md is not generated from README.tmpl.md"
             exit 1
           else
-            echo "Files are identical!"
+            echo "README.md is generated from README.tmpl.md"
           fi
