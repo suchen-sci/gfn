@@ -19,7 +19,7 @@ func TestEqualKV(t *testing.T) {
 			map1[Number(i)] = struct{}{}
 			map2[Number(i)] = struct{}{}
 		}
-		AssertMapEqual(t, map1, map2)
+		AssertTrue(t, EqualKV(map1, map2))
 
 		map2[100] = struct{}{}
 		AssertFalse(t, EqualKV(map1, map2))
@@ -32,7 +32,7 @@ func TestEqualKV(t *testing.T) {
 			map1[i] = strconv.Itoa(i)
 			map2[i] = strconv.Itoa(i)
 		}
-		AssertMapEqual(t, map1, map2)
+		AssertTrue(t, EqualKV(map1, map2))
 
 		map2[0] = "999"
 		AssertFalse(t, EqualKV(map1, map2))
@@ -166,14 +166,22 @@ func TestIsDisjoint(t *testing.T) {
 		m2 := map[int]struct{}{4: {}, 5: {}, 6: {}}
 		AssertTrue(t, IsDisjoint(m1, m2))
 	}
+	{
+		m1 := map[int]struct{}{1: {}, 2: {}, 3: {}}
+		m2 := map[int]struct{}{1: {}, 2: {}, 3: {}}
+		AssertFalse(t, IsDisjoint(m1, m2))
+	}
 }
 
 func TestIntersectKeys(t *testing.T) {
 	m1 := map[int]string{1: "a", 2: "b", 3: "c", 4: "d"}
 	m2 := map[int]string{1: "a", 2: "b"}
 	m3 := map[int]string{2: "b", 3: "c", 4: "d"}
-	keys := IntersectKeys(m1, m2, m3)
+	keys := IntersectKeys[int, string](m1, m2, m3)
 	AssertSliceEqual(t, []int{2}, keys)
+
+	AssertEqual(t, 0, len(IntersectKeys[int, string]()))
+	AssertEqual(t, 4, len(IntersectKeys(m1)))
 }
 
 func TestDifferentKeys(t *testing.T) {
@@ -182,6 +190,9 @@ func TestDifferentKeys(t *testing.T) {
 	m3 := map[int]string{2: "b", 3: "c"}
 	keys := DifferentKeys(m1, m2, m3)
 	AssertSliceEqual(t, []int{4}, keys)
+
+	AssertEqual(t, 0, len(IntersectKeys[int, string]()))
+	AssertEqual(t, 4, len(IntersectKeys(m1)))
 }
 
 func TestGetOrDefault(t *testing.T) {
@@ -205,7 +216,13 @@ func TestEqualKVBy(t *testing.T) {
 			return a == b
 		}))
 	}
-
+	{
+		m1 := map[int]string{1: "a"}
+		m2 := map[int]string{1: "e", 2: "f", 3: "g"}
+		AssertFalse(t, EqualKVBy(m1, m2, func(k int, a, b string) bool {
+			return a == b
+		}))
+	}
 }
 
 func TestForEachKV(t *testing.T) {
@@ -223,4 +240,10 @@ func TestToKV(t *testing.T) {
 		return i, strconv.Itoa(i)
 	})
 	AssertMapEqual(t, map[int]string{0: "0", 1: "1", 2: "2"}, m)
+
+	AssertPanics(t, func() {
+		ToKV(-1, func(i int) (int, string) {
+			return i, strconv.Itoa(i)
+		})
+	})
 }
