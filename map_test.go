@@ -191,8 +191,8 @@ func TestDifferentKeys(t *testing.T) {
 	keys := DifferentKeys(m1, m2, m3)
 	AssertSliceEqual(t, []int{4}, keys)
 
-	AssertEqual(t, 0, len(IntersectKeys[int, string]()))
-	AssertEqual(t, 4, len(IntersectKeys(m1)))
+	AssertEqual(t, 0, len(DifferentKeys[int, string]()))
+	AssertEqual(t, 4, len(DifferentKeys(m1)))
 }
 
 func TestGetOrDefault(t *testing.T) {

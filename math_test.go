@@ -270,6 +270,12 @@ func TestSumBy(t *testing.T) {
 	AssertEqual(t, 60, SumBy(products, func(p Product) int {
 		return p.amount
 	}))
+
+	AssertPanics(t, func() {
+		SumBy([]int{}, func(i int) int {
+			return i
+		})
+	})
 }
 
 func TestMaxBy(t *testing.T) {
@@ -286,6 +292,12 @@ func TestMaxBy(t *testing.T) {
 		return p.amount
 	})
 	AssertEqual(t, "orange", p.name)
+
+	AssertPanics(t, func() {
+		MaxBy([]int{}, func(i int) int {
+			return i
+		})
+	})
 }
 
 func TestMinBy(t *testing.T) {
@@ -294,19 +306,29 @@ func TestMinBy(t *testing.T) {
 		amount int
 	}
 	products := []Product{
-		{"apple", 10},
 		{"banana", 20},
+		{"apple", 10},
 		{"orange", 30},
 	}
 	p := MinBy(products, func(p Product) int {
 		return p.amount
 	})
 	AssertEqual(t, "apple", p.name)
+
+	AssertPanics(t, func() {
+		MinBy([]int{}, func(i int) int {
+			return i
+		})
+	})
 }
 
 func TestMean(t *testing.T) {
 	AssertFloatEqual(t, 2.5, Mean([]int{1, 2, 3, 4}...), "int")
 	AssertFloatEqual(t, 3.0, Mean([]float64{1.5, 2.5, 3.5, 4.5}...), "int")
+
+	AssertPanics(t, func() {
+		Mean([]int{}...)
+	})
 }
 
 func TestMeanBy(t *testing.T) {
@@ -323,4 +345,10 @@ func TestMeanBy(t *testing.T) {
 	AssertFloatEqual(t, 3.0, MeanBy(products, func(p Product) float64 {
 		return p.cost
 	}))
+
+	AssertPanics(t, func() {
+		MeanBy([]int{}, func(i int) int {
+			return i
+		})
+	})
 }
