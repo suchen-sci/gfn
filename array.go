@@ -402,7 +402,8 @@ gfn.DifferenceBy(func(d Data) int { return d.value }, data1, data2)
 */
 
 // DifferenceBy returns a new array that is a copy of the original array,
-// removing all occurrences of any item that also appear in others.
+// removing all occurrences of any item that also appear in others. The occurrences
+// are determined by applying a function to each element.
 func DifferenceBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) []T {
 	res := make([]Pair[U, T], len(array))
 	for i, v := range array {
@@ -424,13 +425,13 @@ func DifferenceBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) [
 }
 
 // Fill sets all elements of an array to a given value.
+// You can control the start and end index by using the slice.
 // @example
 // array := make([]bool, 5)
 // gfn.Fill(array, true)
 // // []bool{true, true, true, true, true}
 //
-// // you can control the start index and end index of the array
-// // by using the slice
+// // you can control the start and end index by using the slice
 // array2 := make([]int, 5)
 // gfn.Fill(array2[2:], 100)
 // // []int{0, 0, 100, 100, 100}
@@ -676,7 +677,7 @@ gfn.IntersectionBy(func(d Data) int { return d.value }, data1, data2)
 */
 
 // IntersectionBy returns a new array that is the intersection of two or more arrays,
-// computed with a given function.
+// where intersection is determined by a given function.
 func IntersectionBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
 	if len(arrays) <= 1 {
 		panic("requires at least 2 arrays")

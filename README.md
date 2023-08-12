@@ -6,12 +6,12 @@
 
 1. No `reflect`. 
 2. No third-party packages. 
-3. `O(n)`.
+3. Time complexity of `O(n)`.
 
 ## Why this lib?
 My friend once complained to me that `Go` is too simple, apart from the essentials, there's hardly anything else. Want to reverse an array? Not available! As a die-hard Gopher, I decided to do something, and hence this library was born. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Go` as possible. The implementation is highly influenced by`Python`, `Ruby`, `JavaScript` and `Lodash`.
 
-On 2023/08/08, with the release of 1.21, `Go` introduced new built-in functions: `min` and `max`, and new standard libraries: `slices` and `maps`. I'm thrilled about these additions. Although 30% of this library can now be replaced by the new built-ins and standard libraries, I've chosen to release this package regardless (still got 70%, right?). I genuinely enjoyed crafting this package, it was a really fun experience.
+On 2023/08/08, with the release of 1.21, `Go` introduced new built-in functions: `min` and `max`, and new standard libraries: `slices` and `maps`. I'm thrilled about these additions. Although 30% of this library can now be replaced by the new built-ins and standard libraries, I've chosen to release this package regardless (still got 70%, right?). I genuinely enjoyed crafting this package, it was really fun.
 
 
 
@@ -315,7 +315,7 @@ gfn.Difference([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
 ```go
 func DifferenceBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) []T 
 ```
-DifferenceBy returns a new array that is a copy of the original array, removing all occurrences of any item that also appear in others.
+DifferenceBy returns a new array that is a copy of the original array, removing all occurrences of any item that also appear in others. The occurrences are determined by applying a function to each element.
 
 #### Example:
 ```go
@@ -362,7 +362,7 @@ gfn.EqualBy(a, b, func(aa int, bb rune) bool {
 ```go
 func Fill[T any](array []T, value T) 
 ```
-Fill sets all elements of an array to a given value.
+Fill sets all elements of an array to a given value. You can control the start and end index by using the slice.
 
 #### Example:
 ```go
@@ -370,8 +370,7 @@ array := make([]bool, 5)
 gfn.Fill(array, true)
 // []bool{true, true, true, true, true}
 
-// you can control the start index and end index of the array
-// by using the slice
+// you can control the start and end index by using the slice
 array2 := make([]int, 5)
 gfn.Fill(array2[2:], 100)
 // []int{0, 0, 100, 100, 100}
@@ -479,7 +478,7 @@ gfn.Intersection(arr1, arr2, arr3, arr4)  // []int{2, 3}
 ```go
 func IntersectionBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T 
 ```
-IntersectionBy returns a new array that is the intersection of two or more arrays, computed with a given function.
+IntersectionBy returns a new array that is the intersection of two or more arrays, where intersection is determined by a given function.
 
 #### Example:
 ```go
@@ -796,7 +795,7 @@ gfn.FilterKV(m, func(k int, v string) bool {
 ```go
 func Map[T any, R any](array []T, mapper func(T) R) []R 
 ```
-Map returns a new array with the results of calling the mapper function on each element. No MapKV because I don't know what to return, an array or a map? Instead, use ForEachKV.
+Map returns a new array with the results of calling the mapper function on each element. No MapKV because I don't know what to return, an array or a map? Instead, please use ForEachKV.
 
 #### Example:
 ```go
@@ -812,7 +811,7 @@ gfn.Map([]int{1, 2, 3}, func(i int) string { return i+1 })
 
 ### gfn.Reduce
 ```go
-func Reduce[T any, R any](array []T, initialValue R, reducer func(R, T) R) R 
+func Reduce[T any, R any](array []T, init R, fn func(R, T) R) R 
 ```
 Reduce executes a reducer function on each element of the array, resulting in a single output value.
 
@@ -827,7 +826,7 @@ gfn.Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
 
 ### gfn.ReduceKV
 ```go
-func ReduceKV[K comparable, V any, R any](m map[K]V, initialValue R, reducer func(R, K, V) R) R 
+func ReduceKV[K comparable, V any, R any](m map[K]V, init R, fn func(R, K, V) R) R 
 ```
 ReduceKV executes a reducer function on each element of the map, resulting in a single output value.
 

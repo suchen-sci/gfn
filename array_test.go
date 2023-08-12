@@ -199,8 +199,8 @@ func TestUnzip(t *testing.T) {
 func TestSample(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		array := Range(i, i+100)
-		samples := Sample(array, 10)
-		AssertEqual(t, 10, len(samples))
+		samples := Sample(array, 90)
+		AssertEqual(t, 90, len(samples))
 		m := map[int]struct{}{}
 		for _, sample := range samples {
 			_, ok := m[sample]

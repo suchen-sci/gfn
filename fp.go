@@ -8,7 +8,7 @@ gfn.Map([]int{1, 2, 3}, func(i int) string {
 */
 
 // Map returns a new array with the results of calling the mapper function on each element.
-// No MapKV because I don't know what to return, an array or a map? Instead, use ForEachKV.
+// No MapKV because I don't know what to return, an array or a map? Instead, please use ForEachKV.
 // @example
 // gfn.Map([]int{1, 2, 3}, func(i int) string { return i+1 })
 // // []int{2, 3, 4}
@@ -59,10 +59,10 @@ gfn.Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
 
 // Reduce executes a reducer function on each element of the array,
 // resulting in a single output value.
-func Reduce[T any, R any](array []T, initialValue R, reducer func(R, T) R) R {
-	result := initialValue
+func Reduce[T any, R any](array []T, init R, fn func(R, T) R) R {
+	result := init
 	for _, v := range array {
-		result = reducer(result, v)
+		result = fn(result, v)
 	}
 	return result
 }
@@ -77,10 +77,10 @@ total := gfn.ReduceKV(m, 0, func(value int, k string, v int) int {
 
 // ReduceKV executes a reducer function on each element of the map,
 // resulting in a single output value.
-func ReduceKV[K comparable, V any, R any](m map[K]V, initialValue R, reducer func(R, K, V) R) R {
-	result := initialValue
+func ReduceKV[K comparable, V any, R any](m map[K]V, init R, fn func(R, K, V) R) R {
+	result := init
 	for k, v := range m {
-		result = reducer(result, k, v)
+		result = fn(result, k, v)
 	}
 	return result
 }
