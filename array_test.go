@@ -104,6 +104,7 @@ func TestEqual(t *testing.T) {
 
 	AssertTrue(t, Equal([]string{"a", "b", "c"}, []string{"a", "b", "c"}))
 	AssertFalse(t, Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"}))
+	AssertFalse(t, Equal([]string{"a", "c", "b"}, []string{"a", "b"}))
 }
 
 func TestToSet(t *testing.T) {
@@ -402,7 +403,7 @@ func TestRemove(t *testing.T) {
 	}
 }
 
-func TestIntersect(t *testing.T) {
+func TestIntersection(t *testing.T) {
 	{
 		arr1 := []int{1, 2, 3, 4, 5}
 		arr2 := []int{2, 3, 4, 5, 6}
@@ -530,7 +531,7 @@ func TestUnionBy(t *testing.T) {
 	AssertSliceEqual(t, expected, union)
 }
 
-func TestIntersectBy(t *testing.T) {
+func TestIntersectionBy(t *testing.T) {
 	type Data struct {
 		value int
 	}
@@ -541,6 +542,10 @@ func TestIntersectBy(t *testing.T) {
 	intersect := IntersectionBy(func(d Data) int { return d.value }, data1, data2, data3, data4)
 	expected := []Data{{3}, {2}}
 	AssertSliceEqual(t, expected, intersect)
+
+	AssertPanics(t, func() {
+		IntersectionBy(func(d Data) int { return d.value }, data1)
+	})
 }
 
 func TestDiffBy(t *testing.T) {
@@ -581,6 +586,10 @@ func TestChunk(t *testing.T) {
 			AssertSliceEqual(t, expected[i], chunks[i], strconv.Itoa(i))
 		}
 	}
+
+	AssertPanics(t, func() {
+		Chunk([]int{1, 2, 3}, 0)
+	})
 }
 
 func TestEqualBy(t *testing.T) {
@@ -593,6 +602,13 @@ func TestEqualBy(t *testing.T) {
 	}
 	{
 		a := []int{1, 2, 3, 4, 5}
+		b := []rune{'a', 'b', 'c', 'd', 'f'}
+		AssertFalse(t, EqualBy(a, b, func(aa int, bb rune) bool {
+			return (aa - 1) == int(bb-'a')
+		}))
+	}
+	{
+		a := []int{1, 2, 3}
 		b := []rune{'a', 'b', 'c', 'd', 'f'}
 		AssertFalse(t, EqualBy(a, b, func(aa int, bb rune) bool {
 			return (aa - 1) == int(bb-'a')
