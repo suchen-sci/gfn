@@ -3,6 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/suchen-sci/gfn?style=flat-square)](https://goreportcard.com/report/github.com/suchen-sci/gfn)
 [![Coverage](https://codecov.io/gh/suchen-sci/gfn/branch/main/graph/badge.svg)](https://app.codecov.io/gh/suchen-sci/gfn/tree/main)
 [![Tests](https://github.com/suchen-sci/gfn/actions/workflows/test.yml/badge.svg)](https://github.com/suchen-sci/gfn/actions/workflows/test.yml)
+[![Releases](https://img.shields.io/github/release/suchen-sci/gfn/all.svg?style=flat-square)](https://github.com/suchen-sci/gfn/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/suchen-sci/gfn/blob/main/LICENSE)
 
 `gfn` is a Golang library that leverages generics to provide various methods, including common functional programming techniques such as `Map`, `Reduce`, and `Filter`, along with other utilities like `Contains`, `Keys`, etc.
