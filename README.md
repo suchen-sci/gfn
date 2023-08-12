@@ -8,6 +8,8 @@
 2. No third-party packages. 
 3. Time complexity of `O(n)`.
 
+> If you're interested in contributing to the project, please spare a moment to read [here](./doc/README.md).
+
 ## Why this lib?
 My friend once complained to me that `Go` is too simple, apart from the essentials, there's hardly anything else. Want to reverse an array? Not available! As a die-hard Gopher, I decided to do something, and hence this library was born. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Go` as possible. The implementation is highly influenced by`Python`, `Ruby`, `JavaScript` and `Lodash`.
 
