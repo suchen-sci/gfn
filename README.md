@@ -9,7 +9,7 @@
 3. `O(n)`.
 
 ## Why this lib?
-My friend once complained to me that `Go` is too simple, apart from the essentials, there's hardly anything else. Want to reverse an array? Not available! As a die-hard Gopher, I decided to do something, and hence this library was born. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Go` as possible. The implementation mainly refers to the methods from `Python`, `Ruby`, `JavaScript` and `Lodash`.
+My friend once complained to me that `Go` is too simple, apart from the essentials, there's hardly anything else. Want to reverse an array? Not available! As a die-hard Gopher, I decided to do something, and hence this library was born. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Go` as possible. The implementation is highly influenced by`Python`, `Ruby`, `JavaScript` and `Lodash`.
 
 On 2023/08/08, with the release of 1.21, `Go` introduced new built-in functions: `min` and `max`, and new standard libraries: `slices` and `maps`. I'm thrilled about these additions. Although 30% of this library can now be replaced by the new built-ins and standard libraries, I've chosen to release this package regardless (still got 70%, right?). I genuinely enjoyed crafting this package, it was a really fun experience.
 
