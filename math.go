@@ -4,14 +4,16 @@ import (
 	"math"
 )
 
+/* @example Max
+gfn.Max([]int16{1, 5, 9, 10}...)  // 10
+gfn.Max("ab", "cd", "e")          // "e"
+*/
+
 // Max returns the maximum value in the array. For float64 arrays, please use MaxFloat64.
 // NaN value in float64 arrays is not comparable to other values.
 // Which means Max([math.NaN(), 0.5]) produces math.NaN(), but Max([0.5, math.NaN()]) produces 0.5.
 // Since arrays with same elements but different order produce different results (inconsistent),
 // this function does not support float64 arrays.
-// @example
-// gfn.Max([]int16{1, 5, 9, 10}...)  // 10
-// gfn.Max("ab", "cd", "e")          // "e"
 func Max[T Int | Uint | ~float32 | ~string](array ...T) T {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -59,10 +61,12 @@ func MaxBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T {
 	return res
 }
 
+/* @example MaxFloat64
+gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
+gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
+*/
+
 // MaxFloat64 returns the maximum value in the array. NaN values are skipped.
-// @example
-// gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
-// gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
 func MaxFloat64(array ...float64) float64 {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -80,11 +84,13 @@ func MaxFloat64(array ...float64) float64 {
 	return res
 }
 
+/* @example Min
+gfn.Min(1.1, 2.2, 3.3)            // 1.1
+gfn.Min([]int16{1, 5, 9, 10}...)  // 1
+*/
+
 // Min returns the minimum value in the array. For float64 arrays, please use MinFloat64.
 // More details in Max.
-// @example
-// gfn.Min(1.1, 2.2, 3.3)            // 1.1
-// gfn.Min([]int16{1, 5, 9, 10}...)  // 1
 func Min[T Int | Uint | ~float32 | ~string](array ...T) T {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -99,10 +105,12 @@ func Min[T Int | Uint | ~float32 | ~string](array ...T) T {
 	return res
 }
 
+/* @example MinFloat64
+gfn.MinFloat64(1, -1, 10)                                   // -1
+gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
+*/
+
 // MinFloat64 returns the minimum value in the array. NaN values are skipped.
-// @example
-// gfn.MinFloat64(1, -1, 10)                                   // -1
-// gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
 func MinFloat64(array ...float64) float64 {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -135,7 +143,7 @@ p := gfn.MinBy(products, func(p Product) int {
 })  // {"apple", 10}
 */
 
-// MinBy returns the maximum value in the array, using the given function to transform values.
+// MinBy returns the minimum value in the array, using the given function to transform values.
 func MinBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -153,13 +161,15 @@ func MinBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T {
 	return res
 }
 
+/* @example Sum
+gfn.Sum([]int{1, 5, 9, 10}...)  // 25
+gfn.Sum(1.1, 2.2, 3.3)          // 6.6
+gfn.Sum("ab", "cd", "e")        // "abcde"
+*/
+
 // Sum returns the sum of all values in the array.
 // Be careful when using this function for float64 arrays with NaN and Inf values.
 // Sum([math.NaN(), 0.5]) produces math.NaN(). Sum(math.Inf(1), math.Inf(-1)) produces math.NaN() too.
-// @example
-// gfn.Sum([]int{1, 5, 9, 10}...)  // 25
-// gfn.Sum(1.1, 2.2, 3.3)          // 6.6
-// gfn.Sum("ab", "cd", "e")        // "abcde"
 func Sum[T Int | Uint | Float | ~string | Complex](array ...T) T {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -201,10 +211,12 @@ func SumBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) U {
 	return res
 }
 
+/* @example Abs
+gfn.Abs(-1)      // 1
+gfn.Abs(-100.99) // 100.99
+*/
+
 // Abs returns the absolute value of x.
-// @example
-// gfn.Abs(-1)      // 1
-// gfn.Abs(-100.99) // 100.99
 func Abs[T Int | Float](x T) T {
 	if x < 0 {
 		return -x
@@ -212,17 +224,21 @@ func Abs[T Int | Float](x T) T {
 	return x
 }
 
+/* @example DivMod
+gfn.DivMod(10, 3) // (3, 1)
+*/
+
 // DivMod returns quotient and remainder of a/b.
-// @example
-// gfn.DivMod(10, 3) // (3, 1)
 func DivMod[T Int | Uint](a, b T) (T, T) {
 	return a / b, a % b
 }
 
+/* @example Mean
+gfn.Mean(1, 2, 3)               // 2.0
+gfn.Mean([]int{1, 2, 3, 4}...)  // 2.5
+*/
+
 // Mean returns the mean of all values in the array.
-// @example
-// gfn.Mean(1, 2, 3)               // 2.0
-// gfn.Mean([]int{1, 2, 3, 4}...)  // 2.5
 func Mean[T Int | Uint | Float](array ...T) float64 {
 	if len(array) == 0 {
 		panic("array is empty")
@@ -262,4 +278,155 @@ func MeanBy[T any, U Int | Uint | Float](array []T, fn func(T) U) float64 {
 		sum += float64(fn(v))
 	}
 	return sum / float64(len(array))
+}
+
+/* @example MinMax
+gfn.MinMax(1, 5, 9, 10)  // 1, 10
+*/
+
+// MinMax returns the minimum and maximum value in the array. For float64 arrays, please use MinMaxFloat64.
+func MinMax[T Int | Uint | ~float32 | ~string](array ...T) (T, T) {
+	if len(array) == 0 {
+		panic("array is empty")
+	}
+
+	minimum := array[0]
+	maximum := array[0]
+	for _, v := range array {
+		if v < minimum {
+			minimum = v
+		}
+		if v > maximum {
+			maximum = v
+		}
+	}
+	return minimum, maximum
+}
+
+/* @example MinMaxFloat64
+gfn.MinMaxFloat64(math.NaN(), 1.85, 2.2) // 1.85, 2.2
+gfn.MinMaxFloat64(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
+*/
+
+// MinMaxFloat64 returns the minimum and maximum value in the array. NaN values are skipped.
+func MinMaxFloat64(array ...float64) (float64, float64) {
+	if len(array) == 0 {
+		panic("array is empty")
+	}
+
+	minimum := array[0]
+	maximum := array[0]
+	for _, v := range array {
+		if math.IsNaN(v) {
+			continue
+		}
+		if math.IsNaN(minimum) || v < minimum {
+			minimum = v
+		}
+		if math.IsNaN(maximum) || v > maximum {
+			maximum = v
+		}
+	}
+	return minimum, maximum
+}
+
+/* @example MinMaxBy
+type Product struct {
+	name   string
+	amount int
+}
+products := []Product{
+	{"banana", 20},
+	{"orange", 30},
+	{"apple", 10},
+	{"grape", 50},
+	{"lemon", 40},
+}
+gfn.MinMaxBy(products, func(p Product) int {
+	return p.amount
+}) // {"apple", 10}, {"grape", 50}
+*/
+
+// MinMaxBy returns the minimum and maximum value in the array, using the given function to transform values.
+func MinMaxBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) (T, T) {
+	if len(array) == 0 {
+		panic("array is empty")
+	}
+
+	minimum := array[0]
+	minValue := fn(minimum)
+	maximum := minimum
+	maxValue := minValue
+	for _, v := range array[1:] {
+		current := fn(v)
+		if current < minValue {
+			minimum = v
+			minValue = current
+		}
+		if current > maxValue {
+			maximum = v
+			maxValue = current
+		}
+	}
+	return minimum, maximum
+}
+
+/* @example Mode
+gfn.Mode([]int{1, 1, 5, 5, 5, 2, 2})) // 5
+*/
+
+// Mode returns the most frequent value in the array.
+func Mode[T comparable](array []T) T {
+	if len(array) == 0 {
+		panic("array is empty")
+	}
+
+	value := array[0]
+	count := 1
+	seen := make(map[T]int)
+
+	for _, v := range array {
+		seen[v]++
+		if seen[v] > count {
+			value = v
+			count = seen[v]
+		}
+	}
+	return value
+}
+
+/* @example ModeBy
+type Product struct {
+	name   string
+	amount int
+}
+products := []Product{
+	{"banana", 20},
+	{"banana", 20},
+	{"apple", 10},
+}
+gfn.ModeBy(products, func(p Product) int {
+	return p.amount
+}) // {"banana", 20}
+*/
+
+// ModeBy returns the most frequent value in the array, using the given function to transform values.
+func ModeBy[T any, U comparable](array []T, fn func(T) U) T {
+	if len(array) == 0 {
+		panic("array is empty")
+	}
+
+	value := array[0]
+	count := 1
+	seen := make(map[U]int)
+
+	for _, v := range array {
+		current := fn(v)
+		seen[current]++
+		if seen[current] > count {
+			value = v
+			count = seen[current]
+		}
+	}
+	return value
 }

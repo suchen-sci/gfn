@@ -9,29 +9,13 @@ import (
 	"text/template"
 )
 
-// format:
-// for multiline example:
-
-/* @example {function name}
-{multiline example code}
-*/
-
-// function comments format:
-/*
-
-// {function name} is {function description}.
-// @example
-// {function name}({function args})
-func {function name} (args) {
-	{code}
-}
-*/
+// See Contributing part in README.md
 
 var categories = [][2]string{
-	{"Array", "array.go"},
 	{"Functional", "fp.go"},
-	{"Map", "map.go"},
 	{"Math", "math.go"},
+	{"Array", "array.go"},
+	{"Map", "map.go"},
 }
 
 const readmeTemplateFile = "README.tmpl.md"
@@ -115,7 +99,6 @@ type fnState int
 const (
 	state_start fnState = iota
 	state_comment
-	state_example
 	state_finish
 	state_abort
 )
@@ -142,14 +125,6 @@ func (f *function) addComment(line string) {
 		line = strings.TrimSpace(line)
 		f.Comment += " " + line
 
-	} else if f.state == state_example {
-		line = strings.TrimPrefix(line, "//")
-		line = strings.TrimSpace(line)
-		if f.Example == "" {
-			f.Example = line
-		} else {
-			f.Example += "\n" + line
-		}
 	}
 }
 
@@ -163,10 +138,6 @@ func (f *function) addSignature(line string) {
 	line = strings.TrimRight(line, "{")
 	f.Signature = line
 	f.state = state_finish
-}
-
-func (f *function) addExample(line string) {
-	f.state = state_example
 }
 
 func (f *function) finish() bool {
@@ -191,14 +162,11 @@ func processCategory(name, filePath string) (*category, error) {
 	i := 0
 	for i < len(lines) {
 		line := lines[i]
-		if strings.HasPrefix(line, "//") && !strings.HasPrefix(line, "// @example") {
+		if strings.HasPrefix(line, "//") {
 			fn.addComment(line)
 
 		} else if strings.HasPrefix(line, "func") {
 			fn.addSignature(line)
-
-		} else if strings.HasPrefix(line, "// @example") {
-			fn.addExample(line)
 
 		} else if strings.HasPrefix(line, "/* @example") {
 			line = strings.TrimPrefix(line, "/* @example")

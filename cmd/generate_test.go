@@ -16,15 +16,11 @@ this is multiline comments for F1.
 
 
 // F1 is f1.
-// @example
-// F1(1)
 func F1(a int) int {
 	return a
 }
 
 // skipFn is a function that should be skipped.
-// @example
-// skipFn(1)
 func skipFn(a int) int {
 	return a
 }
@@ -64,8 +60,6 @@ F1 is f1.
 #### Example:
 ;;;go
 this is multiline comments for F1.
-
-F1(1)
 ;;;
 `
 	expected := strings.TrimSpace(strings.ReplaceAll(content, ";;;", "```"))

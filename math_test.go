@@ -352,3 +352,129 @@ func TestMeanBy(t *testing.T) {
 		})
 	})
 }
+
+func TestMinMax(t *testing.T) {
+	{
+		minVal, maxVal := MinMax(1, 2, 3, 4)
+		AssertEqual(t, 1, minVal)
+		AssertEqual(t, 4, maxVal)
+	}
+
+	// check empty array
+	AssertPanics(t, func() {
+		MinMax([]int{}...)
+	})
+
+	// check array with many elements
+	{
+		array := make([]int, 100000)
+		for i := 0; i < 100000; i++ {
+			array[i] = i
+		}
+		rand.Shuffle(len(array), func(i, j int) {
+			array[i], array[j] = array[j], array[i]
+		})
+		minVal, maxVal := MinMax(array...)
+		AssertEqual(t, 99999, maxVal)
+		AssertEqual(t, 0, minVal)
+	}
+}
+
+func TestMinMaxFloat64(t *testing.T) {
+	var minVal, maxVal float64
+	minVal, maxVal = MinMaxFloat64(math.NaN(), 1.85, 2.2)
+	AssertEqual(t, 1.85, minVal)
+	AssertEqual(t, 2.2, maxVal)
+
+	minVal, maxVal = MinMaxFloat64(1, -1, math.NaN(), 1, 2.8)
+	AssertEqual(t, -1, minVal)
+	AssertEqual(t, 2.8, maxVal)
+
+	minVal, maxVal = MinMaxFloat64(1, -1, math.NaN(), 1, math.Inf(-1))
+	AssertEqual(t, math.Inf(-1), minVal)
+	AssertEqual(t, 1, maxVal)
+
+	minVal, maxVal = MinMaxFloat64(1, -1, 1, math.Inf(1))
+	AssertEqual(t, -1, minVal)
+	AssertEqual(t, math.Inf(1), maxVal)
+
+	minVal, maxVal = MinMaxFloat64(math.NaN(), math.NaN(), math.NaN())
+	AssertTrue(t, math.IsNaN(minVal))
+	AssertTrue(t, math.IsNaN(maxVal))
+
+	// check empty array
+	AssertPanics(t, func() {
+		MinMaxFloat64()
+	})
+
+	// check array with many elements
+	{
+		array := make([]float64, 100000)
+		for i := 0; i < 100000; i++ {
+			array[i] = float64(i)
+		}
+		rand.Shuffle(len(array), func(i, j int) {
+			array[i], array[j] = array[j], array[i]
+		})
+		minVal, maxVal := MinMaxFloat64(array...)
+		AssertEqual(t, float64(0), minVal)
+		AssertEqual(t, float64(99999), maxVal)
+	}
+}
+
+func TestMinMaxBy(t *testing.T) {
+	type Product struct {
+		name   string
+		amount int
+	}
+	products := []Product{
+		{"banana", 20},
+		{"orange", 30},
+		{"apple", 10},
+		{"grape", 50},
+		{"lemon", 40},
+	}
+	minP, maxP := MinMaxBy(products, func(p Product) int {
+		return p.amount
+	})
+	AssertEqual(t, "apple", minP.name)
+	AssertEqual(t, "grape", maxP.name)
+
+	AssertPanics(t, func() {
+		MinMaxBy([]int{}, func(i int) int {
+			return i
+		})
+	})
+}
+
+func TestMode(t *testing.T) {
+	AssertEqual(t, 5, Mode([]int{1, 1, 1, 5, 5, 5, 5, 2, 2, 2}))
+	AssertEqual(t, 1, Mode([]int{1, 1, 1, 1, 5, 5, 5, 5, 2, 2, 2}))
+
+	AssertPanics(t, func() {
+		Mode([]int{})
+	})
+}
+
+func TestModeBy(t *testing.T) {
+	type Product struct {
+		name   string
+		amount int
+	}
+	products := []Product{
+		{"banana", 20},
+		{"banana", 20},
+		{"apple", 10},
+		{"grape", 50},
+		{"lemon", 40},
+	}
+	AssertEqual(t, "banana", ModeBy(products, func(p Product) int {
+		return p.amount
+	}).name)
+
+	AssertPanics(t, func() {
+		ModeBy([]int{}, func(i int) int {
+			return i
+		})
+	})
+}

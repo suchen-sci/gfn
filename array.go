@@ -3,11 +3,13 @@ package gfn
 
 import "math/rand"
 
+/* @example Contains
+gfn.Contains([]int{1, 2, 3}, 2)             // true
+gfn.Contains([]string{"a", "b", "c"}, "b")  // true
+gfn.Contains([]time.Duration{time.Second}, time.Second)  // true
+*/
+
 // Contains returns true if the array contains the value.
-// @example
-// gfn.Contains([]int{1, 2, 3}, 2)             // true
-// gfn.Contains([]string{"a", "b", "c"}, "b")  // true
-// gfn.Contains([]time.Duration{time.Second}, time.Second)  // true
 func Contains[T comparable](array []T, value T) bool {
 	for _, v := range array {
 		if v == value {
@@ -17,12 +19,14 @@ func Contains[T comparable](array []T, value T) bool {
 	return false
 }
 
+/* @example Range
+gfn.Range(0, 7)    // []int{0, 1, 2, 3, 4, 5, 6}
+gfn.Range(3, 8)    // []int{3, 4, 3, 6, 7}
+gfn.Range(-10, -5) // []int{-10, -9, -8, -7, -6}
+*/
+
 // Range function returns a sequence of numbers, starting from start,
 // and increments by 1, until end is reached (not included).
-// @example
-// gfn.Range(0, 7)    // []int{0, 1, 2, 3, 4, 5, 6}
-// gfn.Range(3, 8)    // []int{3, 4, 3, 6, 7}
-// gfn.Range(-10, -5) // []int{-10, -9, -8, -7, -6}
 func Range[T Int | Uint](start, end T) []T {
 	if start >= end {
 		return []T{}
@@ -35,13 +39,15 @@ func Range[T Int | Uint](start, end T) []T {
 	return res
 }
 
+/* @example RangeBy
+gfn.RangeBy(0, 7, 1)   // []int{0, 1, 2, 3, 4, 5, 6}
+gfn.RangeBy(0, 8, 2)   // []int{0, 2, 4, 6}
+gfn.RangeBy(10, 0, -2) // []int{10, 8, 6, 4, 2}
+*/
+
 // RangeBy function returns a sequence of numbers, starting from start,
 // and increments/decrements by step, until end is reached (not included).
 // Zero step panics.
-// @example
-// gfn.RangeBy(0, 7, 1)   // []int{0, 1, 2, 3, 4, 5, 6}
-// gfn.RangeBy(0, 8, 2)   // []int{0, 2, 4, 6}
-// gfn.RangeBy(10, 0, -2) // []int{10, 8, 6, 4, 2}
 func RangeBy[T Int | Uint](start, end, step T) []T {
 	if step == 0 {
 		panic("step must not be zero")
@@ -64,11 +70,13 @@ func RangeBy[T Int | Uint](start, end, step T) []T {
 	return []T{}
 }
 
+/* @example Shuffle
+array := []int{1, 2, 3, 4}
+gfn.Shuffle(array)
+// array: []int{2, 1, 4, 3} or other random order
+*/
+
 // Shuffle randomizes the order of elements by using Fisher–Yates algorithm
-// @example
-// array := []int{1, 2, 3, 4}
-// gfn.Shuffle(array)
-// // array: []int{2, 1, 4, 3} or other random order
 func Shuffle[T any](array []T) {
 	for i := range array {
 		j := rand.Intn(i + 1)
@@ -76,12 +84,14 @@ func Shuffle[T any](array []T) {
 	}
 }
 
+/* @example Equal
+gfn.Equal([]int{1, 2, 3}, []int{1, 2, 3})                    // true
+gfn.Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"})  // false
+*/
+
 // Equal returns true if two arrays are equal. Two arrays are considered equal
 // if both are nil, or if their lengths are equal and their elements are equal.
 // Elements are compared using == operator.
-// @example
-// gfn.Equal([]int{1, 2, 3}, []int{1, 2, 3})                    // true
-// gfn.Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"})  // false
 func Equal[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
@@ -116,10 +126,12 @@ func EqualBy[T1, T2 any](a []T1, b []T2, fn func(T1, T2) bool) bool {
 	return true
 }
 
+/* @example ToSet
+gfn.ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
+// map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
+*/
+
 // ToSet converts an array to a set.
-// @example
-// gfn.ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
-// // map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
 func ToSet[T comparable](array []T) map[T]struct{} {
 	res := make(map[T]struct{})
 	for _, v := range array {
@@ -128,11 +140,13 @@ func ToSet[T comparable](array []T) map[T]struct{} {
 	return res
 }
 
+/* @example IsSortedBy
+gfn.IsSortedBy([]int{2, 2, 1, 1, -1, -1}, func(a, b int) bool { return a >= b })
+// true
+*/
+
 // IsSortedBy returns true if the array is sorted in the given order.
 // The order function should return true if a1 is ok to be placed before a2.
-// @example
-// gfn.IsSortedBy([]int{2, 2, 1, 1, -1, -1}, func(a, b int) bool { return a >= b })
-// // true
 func IsSortedBy[T any](array []T, order func(a1, a2 T) bool) bool {
 	for i := 0; i < len(array)-1; i++ {
 		if !order(array[i], array[i+1]) {
@@ -142,9 +156,11 @@ func IsSortedBy[T any](array []T, order func(a1, a2 T) bool) bool {
 	return true
 }
 
+/* @example IsSorted
+gfn.IsSorted([]int{1, 2, 3, 4})  // true
+*/
+
 // IsSorted returns true if the array is sorted in ascending order.
-// @example
-// gfn.IsSorted([]int{1, 2, 3, 4})  // true
 func IsSorted[T Int | Uint | Float | ~string](array []T) bool {
 	for i := 0; i < len(array)-1; i++ {
 		if array[i] > array[i+1] {
@@ -154,9 +170,11 @@ func IsSorted[T Int | Uint | Float | ~string](array []T) bool {
 	return true
 }
 
+/* @example Counter
+gfn.Counter([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
+*/
+
 // Counter returns a map of values and their counts.
-// @example
-// gfn.Counter([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
 func Counter[T comparable](array []T) map[T]int {
 	res := make(map[T]int)
 	for _, v := range array {
@@ -234,10 +252,12 @@ func Unzip[T, U any](n int, unzipFn func(i int) (T, U)) ([]T, []U) {
 	return a, b
 }
 
+/* @example Sample
+gfn.Sample([]int{1, 2, 3, 4, 5}, 3)  // []int{3, 1, 5} or other random choices.
+*/
+
 // Sample returns a random sample of n elements from an array. Every position in
 // the array are at most selected once. n should be less or equal to len(array).
-// @example
-// gfn.Sample([]int{1, 2, 3, 4, 5}, 3)  // []int{3, 1, 5} or other random choices.
 func Sample[T any](array []T, n int) []T {
 	if n < 0 {
 		panic("negative length")
@@ -254,9 +274,11 @@ func Sample[T any](array []T, n int) []T {
 	return res
 }
 
+/* @example Uniq
+gfn.Uniq([]int{1, 2, 2, 3, 3, 3, 4, 4, 4, 4})  // []int{1, 2, 3, 4}
+*/
+
 // Uniq returns an array with all duplicates removed.
-// @example
-// gfn.Uniq([]int{1, 2, 2, 3, 3, 3, 4, 4, 4, 4})  // []int{1, 2, 3, 4}
 func Uniq[T comparable](array []T) []T {
 	res := []T{}
 	seen := make(map[T]struct{})
@@ -300,10 +322,12 @@ func UniqBy[T any, U comparable](array []T, fn func(T) U) []T {
 	return res
 }
 
+/* @example Union
+gfn.Union([]int{1, 2, 3}, []int{2, 3, 4}, []int{3, 4, 5})
+// []int{1, 2, 3, 4, 5}
+*/
+
 // Union returns an array with all duplicates removed from multiple arrays.
-// @example
-// gfn.Union([]int{1, 2, 3}, []int{2, 3, 4}, []int{3, 4, 5})
-// // []int{1, 2, 3, 4, 5}
 func Union[T comparable](arrays ...[]T) []T {
 	res := []T{}
 	seen := make(map[T]struct{})
@@ -361,24 +385,28 @@ func UnionBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
 	return res
 }
 
+/* @example Copy
+gfn.Copy([]int{1, 2, 3})  // []int{1, 2, 3}
+
+array := []int{1, 2, 3, 4, 5, 6}
+gfn.Copy(array[2:])
+// []int{3, 4, 5, 6}
+*/
+
 // Copy returns a new array that is a shallow copy of the original array.
-// @example
-// gfn.Copy([]int{1, 2, 3})  // []int{1, 2, 3}
-//
-// array := []int{1, 2, 3, 4, 5, 6}
-// gfn.Copy(array[2:])
-// // []int{3, 4, 5, 6}
 func Copy[T any](array []T) []T {
 	res := make([]T, len(array))
 	copy(res, array)
 	return res
 }
 
+/* @example Difference
+gfn.Difference([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
+*/
+
 // Difference returns a new array that is a copy of the original array,
 // removing all occurrences of any item that also appear in others.
 // The order is preserved from the original array.
-// @example
-// gfn.Difference([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
 func Difference[T comparable](array []T, others ...[]T) []T {
 	res := Copy(array)
 	for _, other := range others {
@@ -424,26 +452,30 @@ func DifferenceBy[T any, U comparable](fn func(T) U, array []T, others ...[]T) [
 	})
 }
 
+/* @example Fill
+array := make([]bool, 5)
+gfn.Fill(array, true)
+// []bool{true, true, true, true, true}
+
+// you can control the start and end index by using the slice
+array2 := make([]int, 5)
+gfn.Fill(array2[2:], 100)
+// []int{0, 0, 100, 100, 100}
+*/
+
 // Fill sets all elements of an array to a given value.
 // You can control the start and end index by using the slice.
-// @example
-// array := make([]bool, 5)
-// gfn.Fill(array, true)
-// // []bool{true, true, true, true, true}
-//
-// // you can control the start and end index by using the slice
-// array2 := make([]int, 5)
-// gfn.Fill(array2[2:], 100)
-// // []int{0, 0, 100, 100, 100}
 func Fill[T any](array []T, value T) {
 	for i := range array {
 		array[i] = value
 	}
 }
 
+/* @example Count
+gfn.Count([]int{1, 2, 2, 2, 5, 6}, 2)  // 3
+*/
+
 // Count returns the number of occurrences of a value in an array.
-// @example
-// gfn.Count([]int{1, 2, 2, 2, 5, 6}, 2)  // 3
 func Count[T comparable](array []T, value T) int {
 	res := 0
 	for _, v := range array {
@@ -506,11 +538,13 @@ func GroupBy[T any, K comparable](array []T, groupFn func(T) K) map[K][]T {
 	return res
 }
 
+/* @example IndexOf
+gfn.IndexOf([]int{1, 2, 3, 4}, 3)  // 2
+gfn.IndexOf([]int{1, 2, 3, 4}, 5)  // -1
+*/
+
 // IndexOf returns the index of the first occurrence of a value in an array,
 // or -1 if not found.
-// @example
-// gfn.IndexOf([]int{1, 2, 3, 4}, 3)  // 2
-// gfn.IndexOf([]int{1, 2, 3, 4}, 5)  // -1
 func IndexOf[T comparable](array []T, value T) int {
 	for i, v := range array {
 		if v == value {
@@ -520,11 +554,13 @@ func IndexOf[T comparable](array []T, value T) int {
 	return -1
 }
 
+/* @example LastIndexOf
+gfn.LastIndexOf([]int{3, 3, 3, 4}, 3)  // 2
+gfn.LastIndexOf([]int{1, 2, 3, 4}, 5)  // -1
+*/
+
 // LastIndexOf returns the index of the last occurrence of a value in an array,
 // or -1 if not found.
-// @example
-// gfn.LastIndexOf([]int{3, 3, 3, 4}, 3)  // 2
-// gfn.LastIndexOf([]int{1, 2, 3, 4}, 5)  // -1
 func LastIndexOf[T comparable](array []T, value T) int {
 	for i := len(array) - 1; i >= 0; i-- {
 		if array[i] == value {
@@ -534,11 +570,13 @@ func LastIndexOf[T comparable](array []T, value T) int {
 	return -1
 }
 
+/* @example Reverse
+array := []int{1, 2, 3, 4}
+gfn.Reverse(array)
+// []int{4, 3, 2, 1}
+*/
+
 // Reverse reverses an array in place.
-// @example
-// array := []int{1, 2, 3, 4}
-// gfn.Reverse(array)
-// // []int{4, 3, 2, 1}
 func Reverse[T any](array []T) {
 	for i, j := 0, len(array)-1; i < j; i, j = i+1, j-1 {
 		array[i], array[j] = array[j], array[i]
@@ -579,9 +617,11 @@ func Any[T any](array []T, fn func(T) bool) bool {
 	return false
 }
 
+/* @example Concat
+gfn.Concat([]int{1, 2}, []int{3, 4})  // []int{1, 2, 3, 4}
+*/
+
 // Concat returns a new array that is the result of joining two or more arrays.
-// @example
-// gfn.Concat([]int{1, 2}, []int{3, 4})  // []int{1, 2, 3, 4}
 func Concat[T any](arrays ...[]T) []T {
 	var res []T
 	for _, array := range arrays {
@@ -628,9 +668,11 @@ func FindLast[T any](array []T, fn func(T) bool) (T, int) {
 	return res, -1
 }
 
+/* @example Remove
+gfn.Remove([]int{1, 2, 3, 4, 2, 3, 2, 3}, 2, 3)  // []int{1, 4}
+*/
+
 // Remove removes all elements from an array that equal to given values.
-// @example
-// gfn.Remove([]int{1, 2, 3, 4, 2, 3, 2, 3}, 2, 3)  // []int{1, 4}
 func Remove[T comparable](array []T, values ...T) []T {
 	res := []T{}
 	valueSet := ToSet(values)
@@ -643,13 +685,15 @@ func Remove[T comparable](array []T, values ...T) []T {
 	return res
 }
 
+/* @example Intersection
+arr1 := []int{1, 2, 3, 4, 5}
+arr2 := []int{2, 3, 4, 5, 6}
+arr3 := []int{5, 4, 3, 2}
+arr4 := []int{2, 3}
+gfn.Intersection(arr1, arr2, arr3, arr4)  // []int{2, 3}
+*/
+
 // Intersection returns a new array that is the intersection of two or more arrays.
-// @example
-// arr1 := []int{1, 2, 3, 4, 5}
-// arr2 := []int{2, 3, 4, 5, 6}
-// arr3 := []int{5, 4, 3, 2}
-// arr4 := []int{2, 3}
-// gfn.Intersection(arr1, arr2, arr3, arr4)  // []int{2, 3}
 func Intersection[T comparable](arrays ...[]T) []T {
 	if len(arrays) <= 1 {
 		panic("requires at least 2 arrays")
@@ -708,10 +752,12 @@ func IntersectionBy[T any, U comparable](fn func(T) U, arrays ...[]T) []T {
 	})
 }
 
+/* @example Repeat
+gfn.Repeat([]int{1, 2, 3}, 3)  // []int{1, 2, 3, 1, 2, 3, 1, 2, 3}
+*/
+
 // Repeat returns a new array that is the result of repeating an array
 // a given number of times.
-// @example
-// gfn.Repeat([]int{1, 2, 3}, 3)  // []int{1, 2, 3, 1, 2, 3, 1, 2, 3}
 func Repeat[T any](array []T, repeat int) []T {
 	if repeat < 0 {
 		panic("repeat must be greater or equal to 0")
@@ -745,9 +791,11 @@ func ForEach[T any](array []T, fn func(value T)) {
 	}
 }
 
+/* @example Chunk
+gfn.Chunk([]int{1, 2, 3, 4, 5}, 2)  // [][]int{{1, 2}, {3, 4}, {5}}
+*/
+
 // Chunk splits an array into chunks of given size.
-// @example
-// gfn.Chunk([]int{1, 2, 3, 4, 5}, 2)  // [][]int{{1, 2}, {3, 4}, {5}}
 func Chunk[T any](array []T, size int) [][]T {
 	if size <= 0 {
 		panic("size must be greater than 0")
