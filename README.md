@@ -1527,6 +1527,8 @@ then run following command to update `README.md` (generated from `README.tmpl.md
 make doc
 ```
 
+[back to top](#gfn)
+
 ## License
 `gfn` is under the MIT license. See the [LICENSE](https://github.com/suchen-sci/gfn/blob/main/LICENSE) file for details.
 
