@@ -164,6 +164,7 @@ array := []int{1, 2, 3, 4, 5, 6}
 gfn.Filter(array, func(i int) bool { return i%2 == 0 })
 // []int{2, 4, 6}
 ```
+[back to top](#gfn)
 
 
 ### gfn.FilterKV
@@ -180,6 +181,7 @@ gfn.FilterKV(m, func(k int, v string) bool {
 })
 // map[int]string{1: "a", 3: "c"}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Map
@@ -198,6 +200,7 @@ gfn.Map([]int{1, 2, 3}, func(i int) string {
 })
 // []string{"1", "2", "3"}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Reduce
@@ -213,6 +216,7 @@ gfn.Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
 })
 // 6
 ```
+[back to top](#gfn)
 
 
 ### gfn.ReduceKV
@@ -229,6 +233,7 @@ total := gfn.ReduceKV(m, 0, func(value int, k string, v int) int {
 })
 // 6
 ```
+[back to top](#gfn)
 
 
 
@@ -247,6 +252,7 @@ Abs returns the absolute value of x.
 gfn.Abs(-1)      // 1
 gfn.Abs(-100.99) // 100.99
 ```
+[back to top](#gfn)
 
 
 ### gfn.DivMod
@@ -259,6 +265,7 @@ DivMod returns quotient and remainder of a/b.
 ```go
 gfn.DivMod(10, 3) // (3, 1)
 ```
+[back to top](#gfn)
 
 
 ### gfn.Max
@@ -272,6 +279,7 @@ Max returns the maximum value in the array. For float64 arrays, please use MaxFl
 gfn.Max([]int16{1, 5, 9, 10}...)  // 10
 gfn.Max("ab", "cd", "e")          // "e"
 ```
+[back to top](#gfn)
 
 
 ### gfn.MaxBy
@@ -295,6 +303,7 @@ p := gfn.MaxBy(products, func(p Product) int {
     return p.amount
 })  // {"orange", 30}
 ```
+[back to top](#gfn)
 
 
 ### gfn.MaxFloat64
@@ -308,6 +317,7 @@ MaxFloat64 returns the maximum value in the array. NaN values are skipped.
 gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
 gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
 ```
+[back to top](#gfn)
 
 
 ### gfn.Mean
@@ -321,6 +331,7 @@ Mean returns the mean of all values in the array.
 gfn.Mean(1, 2, 3)               // 2.0
 gfn.Mean([]int{1, 2, 3, 4}...)  // 2.5
 ```
+[back to top](#gfn)
 
 
 ### gfn.MeanBy
@@ -345,6 +356,7 @@ gfn.MeanBy(products, func(p Product) float64 {
     return p.cost
 })  // 3.0
 ```
+[back to top](#gfn)
 
 
 ### gfn.Min
@@ -358,6 +370,7 @@ Min returns the minimum value in the array. For float64 arrays, please use MinFl
 gfn.Min(1.1, 2.2, 3.3)            // 1.1
 gfn.Min([]int16{1, 5, 9, 10}...)  // 1
 ```
+[back to top](#gfn)
 
 
 ### gfn.MinBy
@@ -381,6 +394,7 @@ p := gfn.MinBy(products, func(p Product) int {
     return p.amount
 })  // {"apple", 10}
 ```
+[back to top](#gfn)
 
 
 ### gfn.MinFloat64
@@ -394,6 +408,7 @@ MinFloat64 returns the minimum value in the array. NaN values are skipped.
 gfn.MinFloat64(1, -1, 10)                                   // -1
 gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
 ```
+[back to top](#gfn)
 
 
 ### gfn.MinMax
@@ -406,6 +421,7 @@ MinMax returns the minimum and maximum value in the array. For float64 arrays, p
 ```go
 gfn.MinMax(1, 5, 9, 10)  // 1, 10
 ```
+[back to top](#gfn)
 
 
 ### gfn.MinMaxBy
@@ -431,6 +447,7 @@ gfn.MinMaxBy(products, func(p Product) int {
     return p.amount
 }) // {"apple", 10}, {"grape", 50}
 ```
+[back to top](#gfn)
 
 
 ### gfn.MinMaxFloat64
@@ -444,6 +461,7 @@ MinMaxFloat64 returns the minimum and maximum value in the array. NaN values are
 gfn.MinMaxFloat64(math.NaN(), 1.85, 2.2) // 1.85, 2.2
 gfn.MinMaxFloat64(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
 ```
+[back to top](#gfn)
 
 
 ### gfn.Mode
@@ -456,6 +474,7 @@ Mode returns the most frequent value in the array.
 ```go
 gfn.Mode([]int{1, 1, 5, 5, 5, 2, 2})) // 5
 ```
+[back to top](#gfn)
 
 
 ### gfn.ModeBy
@@ -479,6 +498,7 @@ gfn.ModeBy(products, func(p Product) int {
     return p.amount
 }) // {"banana", 20}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Sum
@@ -493,6 +513,7 @@ gfn.Sum([]int{1, 5, 9, 10}...)  // 25
 gfn.Sum(1.1, 2.2, 3.3)          // 6.6
 gfn.Sum("ab", "cd", "e")        // "abcde"
 ```
+[back to top](#gfn)
 
 
 ### gfn.SumBy
@@ -516,6 +537,7 @@ gfn.SumBy(products, func(p Product) int {
     return p.amount
 }) // 60
 ```
+[back to top](#gfn)
 
 
 
@@ -536,6 +558,7 @@ gfn.All([]int{1, 2, 3, 4}, func(i int) bool {
 }
 // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.Any
@@ -551,6 +574,7 @@ gfn.Any([]int{1, 2, 3, 4}, func(i int) bool {
 }
 // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.Chunk
@@ -563,6 +587,7 @@ Chunk splits an array into chunks of given size.
 ```go
 gfn.Chunk([]int{1, 2, 3, 4, 5}, 2)  // [][]int{{1, 2}, {3, 4}, {5}}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Concat
@@ -575,6 +600,7 @@ Concat returns a new array that is the result of joining two or more arrays.
 ```go
 gfn.Concat([]int{1, 2}, []int{3, 4})  // []int{1, 2, 3, 4}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Contains
@@ -589,6 +615,7 @@ gfn.Contains([]int{1, 2, 3}, 2)             // true
 gfn.Contains([]string{"a", "b", "c"}, "b")  // true
 gfn.Contains([]time.Duration{time.Second}, time.Second)  // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.Copy
@@ -605,6 +632,7 @@ array := []int{1, 2, 3, 4, 5, 6}
 gfn.Copy(array[2:])
 // []int{3, 4, 5, 6}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Count
@@ -617,6 +645,7 @@ Count returns the number of occurrences of a value in an array.
 ```go
 gfn.Count([]int{1, 2, 2, 2, 5, 6}, 2)  // 3
 ```
+[back to top](#gfn)
 
 
 ### gfn.CountBy
@@ -641,6 +670,7 @@ gfn.CountBy(employees, func(e Employee) bool {
     return e.department == "Engineering"
 })  // 3
 ```
+[back to top](#gfn)
 
 
 ### gfn.Counter
@@ -653,6 +683,7 @@ Counter returns a map of values and their counts.
 ```go
 gfn.Counter([]int{1, 2, 2, 2, 2})  // map[int]int{1: 1, 2: 4}
 ```
+[back to top](#gfn)
 
 
 ### gfn.CounterBy
@@ -676,6 +707,7 @@ gfn.CounterBy(employees, func(e Employee) string {
     return e.department
 })  // map[string]int{"Accounting": 1, "Engineering": 2}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Difference
@@ -688,6 +720,7 @@ Difference returns a new array that is a copy of the original array, removing al
 ```go
 gfn.Difference([]int{1, 2, 3, 4}, []int{2, 4})  // []int{1, 3}
 ```
+[back to top](#gfn)
 
 
 ### gfn.DifferenceBy
@@ -706,6 +739,7 @@ data2 := []Data{{3}, {4}, {5}}
 gfn.DifferenceBy(func(d Data) int { return d.value }, data1, data2)
 // []Data{{1}, {2}, {2}}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Equal
@@ -719,6 +753,7 @@ Equal returns true if two arrays are equal. Two arrays are considered equal if b
 gfn.Equal([]int{1, 2, 3}, []int{1, 2, 3})                    // true
 gfn.Equal([]string{"a", "c", "b"}, []string{"a", "b", "c"})  // false
 ```
+[back to top](#gfn)
 
 
 ### gfn.EqualBy
@@ -735,6 +770,7 @@ gfn.EqualBy(a, b, func(aa int, bb rune) bool {
     return (aa - 1) == int(bb-'a')
 }) // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.Fill
@@ -754,6 +790,7 @@ array2 := make([]int, 5)
 gfn.Fill(array2[2:], 100)
 // []int{0, 0, 100, 100, 100}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Find
@@ -769,6 +806,7 @@ value, index := gfn.Find([]string{"a", "ab", "abc"}, func(s string) bool {
 })
 // "ab", 1
 ```
+[back to top](#gfn)
 
 
 ### gfn.FindLast
@@ -784,6 +822,7 @@ value, index := gfn.FindLast([]string{"a", "ab", "abc"}, func(s string) bool {
 })
 // "abc", 2
 ```
+[back to top](#gfn)
 
 
 ### gfn.ForEach
@@ -800,6 +839,7 @@ gfn.ForEach([]int{1, 2, 3}, func(i int) {
 })
 // sum == 6
 ```
+[back to top](#gfn)
 
 
 ### gfn.GroupBy
@@ -822,6 +862,7 @@ groups := gfn.GroupBy(array, func(i int) string {
 //     "odd":  []int{1, 3, 5, 7},
 // }
 ```
+[back to top](#gfn)
 
 
 ### gfn.IndexOf
@@ -835,6 +876,7 @@ IndexOf returns the index of the first occurrence of a value in an array, or -1 
 gfn.IndexOf([]int{1, 2, 3, 4}, 3)  // 2
 gfn.IndexOf([]int{1, 2, 3, 4}, 5)  // -1
 ```
+[back to top](#gfn)
 
 
 ### gfn.Intersection
@@ -851,6 +893,7 @@ arr3 := []int{5, 4, 3, 2}
 arr4 := []int{2, 3}
 gfn.Intersection(arr1, arr2, arr3, arr4)  // []int{2, 3}
 ```
+[back to top](#gfn)
 
 
 ### gfn.IntersectionBy
@@ -869,6 +912,7 @@ data2 := []Data{{2}, {3}}
 gfn.IntersectionBy(func(d Data) int { return d.value }, data1, data2)
 // []Data{{3}, {2}}
 ```
+[back to top](#gfn)
 
 
 ### gfn.IsSorted
@@ -881,6 +925,7 @@ IsSorted returns true if the array is sorted in ascending order.
 ```go
 gfn.IsSorted([]int{1, 2, 3, 4})  // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.IsSortedBy
@@ -894,6 +939,7 @@ IsSortedBy returns true if the array is sorted in the given order. The order fun
 gfn.IsSortedBy([]int{2, 2, 1, 1, -1, -1}, func(a, b int) bool { return a >= b })
 // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.LastIndexOf
@@ -907,6 +953,7 @@ LastIndexOf returns the index of the last occurrence of a value in an array, or 
 gfn.LastIndexOf([]int{3, 3, 3, 4}, 3)  // 2
 gfn.LastIndexOf([]int{1, 2, 3, 4}, 5)  // -1
 ```
+[back to top](#gfn)
 
 
 ### gfn.Range
@@ -921,6 +968,7 @@ gfn.Range(0, 7)    // []int{0, 1, 2, 3, 4, 5, 6}
 gfn.Range(3, 8)    // []int{3, 4, 3, 6, 7}
 gfn.Range(-10, -5) // []int{-10, -9, -8, -7, -6}
 ```
+[back to top](#gfn)
 
 
 ### gfn.RangeBy
@@ -935,6 +983,7 @@ gfn.RangeBy(0, 7, 1)   // []int{0, 1, 2, 3, 4, 5, 6}
 gfn.RangeBy(0, 8, 2)   // []int{0, 2, 4, 6}
 gfn.RangeBy(10, 0, -2) // []int{10, 8, 6, 4, 2}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Remove
@@ -947,6 +996,7 @@ Remove removes all elements from an array that equal to given values.
 ```go
 gfn.Remove([]int{1, 2, 3, 4, 2, 3, 2, 3}, 2, 3)  // []int{1, 4}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Repeat
@@ -959,6 +1009,7 @@ Repeat returns a new array that is the result of repeating an array a given numb
 ```go
 gfn.Repeat([]int{1, 2, 3}, 3)  // []int{1, 2, 3, 1, 2, 3, 1, 2, 3}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Reverse
@@ -973,6 +1024,7 @@ array := []int{1, 2, 3, 4}
 gfn.Reverse(array)
 // []int{4, 3, 2, 1}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Sample
@@ -985,6 +1037,7 @@ Sample returns a random sample of n elements from an array. Every position in th
 ```go
 gfn.Sample([]int{1, 2, 3, 4, 5}, 3)  // []int{3, 1, 5} or other random choices.
 ```
+[back to top](#gfn)
 
 
 ### gfn.Shuffle
@@ -999,6 +1052,7 @@ array := []int{1, 2, 3, 4}
 gfn.Shuffle(array)
 // array: []int{2, 1, 4, 3} or other random order
 ```
+[back to top](#gfn)
 
 
 ### gfn.ToSet
@@ -1012,6 +1066,7 @@ ToSet converts an array to a set.
 gfn.ToSet([]int{0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5})
 // map[int]struct{}{0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Union
@@ -1025,6 +1080,7 @@ Union returns an array with all duplicates removed from multiple arrays.
 gfn.Union([]int{1, 2, 3}, []int{2, 3, 4}, []int{3, 4, 5})
 // []int{1, 2, 3, 4, 5}
 ```
+[back to top](#gfn)
 
 
 ### gfn.UnionBy
@@ -1059,6 +1115,7 @@ gfn.UnionBy(func(e Employee) string { return e.name }, group1, group2)
 //     {"Eve", "Engineering"},
 // }
 ```
+[back to top](#gfn)
 
 
 ### gfn.Uniq
@@ -1071,6 +1128,7 @@ Uniq returns an array with all duplicates removed.
 ```go
 gfn.Uniq([]int{1, 2, 2, 3, 3, 3, 4, 4, 4, 4})  // []int{1, 2, 3, 4}
 ```
+[back to top](#gfn)
 
 
 ### gfn.UniqBy
@@ -1096,6 +1154,7 @@ gfn.UniqBy(employees, func(e Employee) string {
 })
 // []Employee{{"Alice", "Accounting"}, {"Cindy", "Engineering"}}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Unzip
@@ -1116,6 +1175,7 @@ gfn.Unzip(len(pairs), func(i int) (int, string) {
 })
 // ([]int{1, 2, 3}, []string{"a", "b", "c"})
 ```
+[back to top](#gfn)
 
 
 ### gfn.Zip
@@ -1133,6 +1193,7 @@ gfn.Zip([]int{1, 2, 3}, []string{"a", "b", "c"})
 //     {First: 3, Second: "c"}
 // }
 ```
+[back to top](#gfn)
 
 
 
@@ -1152,6 +1213,7 @@ m := map[int]string{1: "a", 2: "b", 3: "c"}
 gfn.Clear(m)
 // m is now an empty map
 ```
+[back to top](#gfn)
 
 
 ### gfn.Clone
@@ -1166,6 +1228,7 @@ m := map[int]string{1: "a", 2: "b", 3: "c"}
 m2 := gfn.Clone(m)
 // m2 is a copy of m
 ```
+[back to top](#gfn)
 
 
 ### gfn.DeleteBy
@@ -1182,6 +1245,7 @@ gfn.DeleteBy(m, func(k int, v string) bool {
 })
 // map[int]string{2: "b"}
 ```
+[back to top](#gfn)
 
 
 ### gfn.DifferentKeys
@@ -1197,6 +1261,7 @@ m2 := map[int]string{1: "a", 2: "b"}
 m3 := map[int]string{2: "b", 3: "c"}
 gfn.DifferentKeys(m1, m2, m3)  // []int{4}
 ```
+[back to top](#gfn)
 
 
 ### gfn.EqualKV
@@ -1211,6 +1276,7 @@ map1 := map[int]struct{}{1: {}, 2: {}, 3: {}}
 map2 := map[int]struct{}{1: {}, 2: {}, 3: {}}
 gfn.EqualKV(map1, map2) // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.EqualKVBy
@@ -1227,6 +1293,7 @@ gfn.EqualKVBy(m1, m2, func(k int, a, b string) bool {
     return len(a) == len(b)
 }) // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.ForEachKV
@@ -1251,6 +1318,7 @@ gfn.ForEachKV(m, func(k int, v string) {
 }
 // invert is map[string]int{"a": 1, "b": 2, "c": 3}
 ```
+[back to top](#gfn)
 
 
 ### gfn.GetOrDefault
@@ -1265,6 +1333,7 @@ m := map[int]string{1: "a", 2: "b", 3: "c"}
 gfn.GetOrDefault(m, 1, "d")  // "a"
 gfn.GetOrDefault(m, 4, "d")  // "d"
 ```
+[back to top](#gfn)
 
 
 ### gfn.IntersectKeys
@@ -1280,6 +1349,7 @@ m2 := map[int]string{1: "a", 2: "b"}
 m3 := map[int]string{2: "b", 3: "c", 4: "d"}
 gfn.IntersectKeys(m1, m2, m3)  // []int{2}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Invert
@@ -1305,6 +1375,7 @@ gfn.Invert(m)
 //     "math.go":  "Math",
 // }
 ```
+[back to top](#gfn)
 
 
 ### gfn.IsDisjoint
@@ -1323,6 +1394,7 @@ m3 := map[int]struct{}{1: {}, 2: {}, 3: {}}
 m4 := map[int]struct{}{4: {}, 5: {}, 6: {}}
 gfn.IsDisjoint(m3, m4)  // true
 ```
+[back to top](#gfn)
 
 
 ### gfn.Items
@@ -1342,6 +1414,7 @@ gfn.Items(m)
 //     {3, "c"},
 // }
 ```
+[back to top](#gfn)
 
 
 ### gfn.Keys
@@ -1355,6 +1428,7 @@ Keys returns the keys of a map.
 gfn.Keys(map[int]string{1: "a", 2: "b", 3: "c"})
 // []int{1, 2, 3} or []int{3, 2, 1} or []int{2, 1, 3} etc.
 ```
+[back to top](#gfn)
 
 
 ### gfn.Select
@@ -1371,6 +1445,7 @@ gfn.Select(m, func(k int, v string) bool {
 })
 // map[int]string{1: "a", 3: "c"}
 ```
+[back to top](#gfn)
 
 
 ### gfn.ToKV
@@ -1386,6 +1461,7 @@ gfn.ToKV(3, func(i int) (int, string) {
 })
 // map[int]string{0: "0", 1: "1", 2: "2"}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Update
@@ -1409,6 +1485,7 @@ m3 := map[int]string{1: "f"}
 gfn.Update(m1, m2, m3)
 // map[int]string{1: "f", 2: "e", 3: "c"}
 ```
+[back to top](#gfn)
 
 
 ### gfn.Values
@@ -1422,6 +1499,7 @@ Values returns the values of a map.
 gfn.Values(map[int]string{1: "a", 2: "b", 3: "c"})
 // []string{"a", "b", "c"} or []string{"c", "b", "a"} or []string{"b", "a", "c"} etc.
 ```
+[back to top](#gfn)
 
 
 

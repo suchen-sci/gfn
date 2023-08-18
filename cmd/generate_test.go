@@ -61,6 +61,7 @@ F1 is f1.
 ;;;go
 this is multiline comments for F1.
 ;;;
+[back to top](#gfn)
 `
 	expected := strings.TrimSpace(strings.ReplaceAll(content, ";;;", "```"))
 	got := strings.TrimSpace(cat.content())

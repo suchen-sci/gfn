@@ -67,6 +67,7 @@ const contentTemplate = `
 ;;;go
 {{ .Example }}
 ;;;
+[back to top](#gfn)
 {{ end }}
 {{ end }}
 {{ end }}
