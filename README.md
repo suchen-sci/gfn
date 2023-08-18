@@ -4,26 +4,47 @@
 [![Coverage](https://codecov.io/gh/suchen-sci/gfn/branch/main/graph/badge.svg)](https://app.codecov.io/gh/suchen-sci/gfn/tree/main)
 [![Tests](https://github.com/suchen-sci/gfn/actions/workflows/test.yml/badge.svg)](https://github.com/suchen-sci/gfn/actions/workflows/test.yml)
 [![Releases](https://img.shields.io/github/release/suchen-sci/gfn/all.svg?style=flat-square)](https://github.com/suchen-sci/gfn/releases)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/suchen-sci/gfn/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/suchen-sci/gfn/blob/main/LICENSE)
 
-`gfn` is a Golang library that leverages generics to provide various methods, including common functional programming techniques such as `Map`, `Reduce`, and `Filter`, along with other utilities like `Contains`, `Keys`, etc.
+`gfn` is a Golang library that leverages generics to provide various methods, including common functional programming techniques such as `Map`, `Reduce`, and `Filter`, along with other utilities like `Contains`, `Keys`, etc. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Go` as possible. The implementation is highly influenced by`Python`, `Ruby`, `JavaScript` and `Lodash`.
 
 1. No `reflect`. 
 2. No third-party packages. 
 3. Time complexity of `O(n)`.
 
-> If you're interested in contributing to the project, please spare a moment to read [here](./doc/README.md).
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Why this lib?
-My friend once complained to me that `Go` is too simple, apart from the essentials, there's hardly anything else. Want to reverse an array? Not available! As a die-hard Gopher, I decided to do something, and hence this library was born. The idea of this library is very simple, it aims to port as many small utilities from other languages to `Go` as possible. The implementation is highly influenced by`Python`, `Ruby`, `JavaScript` and `Lodash`.
-
-On 2023/08/08, with the release of 1.21, `Go` introduced new built-in functions: `min` and `max`, and new standard libraries: `slices` and `maps`. I'm thrilled about these additions. Although 30% of this library can now be replaced by the new built-ins and standard libraries, I've chosen to release this package regardless (still got 70%, right?). I genuinely enjoyed crafting this package, it was really fun.
-
-
+## Documentation
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Type](#type)
+- [Functional](#functional)
+  - [gfn.Filter](#gfnfilter)
+  - [gfn.FilterKV](#gfnfilterkv)
+  - [gfn.Map](#gfnmap)
+  - [gfn.Reduce](#gfnreduce)
+  - [gfn.ReduceKV](#gfnreducekv)
+- [Math](#math)
+  - [gfn.Abs](#gfnabs)
+  - [gfn.DivMod](#gfndivmod)
+  - [gfn.Max](#gfnmax)
+  - [gfn.MaxBy](#gfnmaxby)
+  - [gfn.MaxFloat64](#gfnmaxfloat64)
+  - [gfn.Mean](#gfnmean)
+  - [gfn.MeanBy](#gfnmeanby)
+  - [gfn.Min](#gfnmin)
+  - [gfn.MinBy](#gfnminby)
+  - [gfn.MinFloat64](#gfnminfloat64)
+  - [gfn.MinMax](#gfnminmax)
+  - [gfn.MinMaxBy](#gfnminmaxby)
+  - [gfn.MinMaxFloat64](#gfnminmaxfloat64)
+  - [gfn.Mode](#gfnmode)
+  - [gfn.ModeBy](#gfnmodeby)
+  - [gfn.Sum](#gfnsum)
+  - [gfn.SumBy](#gfnsumby)
 - [Array](#array)
   - [gfn.All](#gfnall)
   - [gfn.Any](#gfnany)
@@ -64,12 +85,6 @@ On 2023/08/08, with the release of 1.21, `Go` introduced new built-in functions:
   - [gfn.UniqBy](#gfnuniqby)
   - [gfn.Unzip](#gfnunzip)
   - [gfn.Zip](#gfnzip)
-- [Functional](#functional)
-  - [gfn.Filter](#gfnfilter)
-  - [gfn.FilterKV](#gfnfilterkv)
-  - [gfn.Map](#gfnmap)
-  - [gfn.Reduce](#gfnreduce)
-  - [gfn.ReduceKV](#gfnreducekv)
 - [Map](#map)
   - [gfn.Clear](#gfnclear)
   - [gfn.Clone](#gfnclone)
@@ -88,19 +103,6 @@ On 2023/08/08, with the release of 1.21, `Go` introduced new built-in functions:
   - [gfn.ToKV](#gfntokv)
   - [gfn.Update](#gfnupdate)
   - [gfn.Values](#gfnvalues)
-- [Math](#math)
-  - [gfn.Abs](#gfnabs)
-  - [gfn.DivMod](#gfndivmod)
-  - [gfn.Max](#gfnmax)
-  - [gfn.MaxBy](#gfnmaxby)
-  - [gfn.MaxFloat64](#gfnmaxfloat64)
-  - [gfn.Mean](#gfnmean)
-  - [gfn.MeanBy](#gfnmeanby)
-  - [gfn.Min](#gfnmin)
-  - [gfn.MinBy](#gfnminby)
-  - [gfn.MinFloat64](#gfnminfloat64)
-  - [gfn.Sum](#gfnsum)
-  - [gfn.SumBy](#gfnsumby)
 
 
 
@@ -145,6 +147,377 @@ type Pair[T, U any] struct {
     Second U
 }
 ```
+
+
+## Functional
+
+
+### gfn.Filter
+```go
+func Filter[T any](array []T, filter func(T) bool) []T 
+```
+Filter returns a new array containing elements of the original array that satisfy the provided function.
+
+#### Example:
+```go
+array := []int{1, 2, 3, 4, 5, 6}
+gfn.Filter(array, func(i int) bool { return i%2 == 0 })
+// []int{2, 4, 6}
+```
+
+
+### gfn.FilterKV
+```go
+func FilterKV[K comparable, V any](m map[K]V, fn func(K, V) bool) map[K]V 
+```
+FilterKV returns a new map containing elements of the original map that satisfy the provided function.
+
+#### Example:
+```go
+m := map[int]string{1: "a", 2: "b", 3: "c"}
+gfn.FilterKV(m, func(k int, v string) bool {
+    return k == 1 || v == "c"
+})
+// map[int]string{1: "a", 3: "c"}
+```
+
+
+### gfn.Map
+```go
+func Map[T any, R any](array []T, mapper func(T) R) []R 
+```
+Map returns a new array with the results of calling the mapper function on each element. No MapKV because I don't know what to return, an array or a map? Instead, please use ForEachKV.
+
+#### Example:
+```go
+gfn.Map([]int{1, 2, 3}, func(i int) string { return i+1 })
+// []int{2, 3, 4}
+
+gfn.Map([]int{1, 2, 3}, func(i int) string {
+    return strconv.Itoa(i)
+})
+// []string{"1", "2", "3"}
+```
+
+
+### gfn.Reduce
+```go
+func Reduce[T any, R any](array []T, init R, fn func(R, T) R) R 
+```
+Reduce executes a reducer function on each element of the array, resulting in a single output value.
+
+#### Example:
+```go
+gfn.Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
+    return a + b
+})
+// 6
+```
+
+
+### gfn.ReduceKV
+```go
+func ReduceKV[K comparable, V any, R any](m map[K]V, init R, fn func(R, K, V) R) R 
+```
+ReduceKV executes a reducer function on each element of the map, resulting in a single output value.
+
+#### Example:
+```go
+m := map[string]int{"a": 1, "b": 2, "c": 3}
+total := gfn.ReduceKV(m, 0, func(value int, k string, v int) int {
+    return value + v
+})
+// 6
+```
+
+
+
+
+## Math
+
+
+### gfn.Abs
+```go
+func Abs[T Int | Float](x T) T 
+```
+Abs returns the absolute value of x.
+
+#### Example:
+```go
+gfn.Abs(-1)      // 1
+gfn.Abs(-100.99) // 100.99
+```
+
+
+### gfn.DivMod
+```go
+func DivMod[T Int | Uint](a, b T) (T, T) 
+```
+DivMod returns quotient and remainder of a/b.
+
+#### Example:
+```go
+gfn.DivMod(10, 3) // (3, 1)
+```
+
+
+### gfn.Max
+```go
+func Max[T Int | Uint | ~float32 | ~string](array ...T) T 
+```
+Max returns the maximum value in the array. For float64 arrays, please use MaxFloat64. NaN value in float64 arrays is not comparable to other values. Which means Max([math.NaN(), 0.5]) produces math.NaN(), but Max([0.5, math.NaN()]) produces 0.5. Since arrays with same elements but different order produce different results (inconsistent), this function does not support float64 arrays.
+
+#### Example:
+```go
+gfn.Max([]int16{1, 5, 9, 10}...)  // 10
+gfn.Max("ab", "cd", "e")          // "e"
+```
+
+
+### gfn.MaxBy
+```go
+func MaxBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T 
+```
+MaxBy returns the maximum value in the array, using the given function to transform values.
+
+#### Example:
+```go
+type Product struct {
+    name   string
+    amount int
+}
+products := []Product{
+    {"apple", 10},
+    {"banana", 20},
+    {"orange", 30},
+}
+p := gfn.MaxBy(products, func(p Product) int {
+    return p.amount
+})  // {"orange", 30}
+```
+
+
+### gfn.MaxFloat64
+```go
+func MaxFloat64(array ...float64) float64 
+```
+MaxFloat64 returns the maximum value in the array. NaN values are skipped.
+
+#### Example:
+```go
+gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
+gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
+```
+
+
+### gfn.Mean
+```go
+func Mean[T Int | Uint | Float](array ...T) float64 
+```
+Mean returns the mean of all values in the array.
+
+#### Example:
+```go
+gfn.Mean(1, 2, 3)               // 2.0
+gfn.Mean([]int{1, 2, 3, 4}...)  // 2.5
+```
+
+
+### gfn.MeanBy
+```go
+func MeanBy[T any, U Int | Uint | Float](array []T, fn func(T) U) float64 
+```
+MeanBy returns the mean of all values in the array after applying fn to each value.
+
+#### Example:
+```go
+type Product struct {
+    name string
+    cost float64
+}
+products := []Product{
+    {"apple", 1.5},
+    {"banana", 2.5},
+    {"orange", 3.5},
+    {"lemon", 4.5},
+}
+gfn.MeanBy(products, func(p Product) float64 {
+    return p.cost
+})  // 3.0
+```
+
+
+### gfn.Min
+```go
+func Min[T Int | Uint | ~float32 | ~string](array ...T) T 
+```
+Min returns the minimum value in the array. For float64 arrays, please use MinFloat64. More details in Max.
+
+#### Example:
+```go
+gfn.Min(1.1, 2.2, 3.3)            // 1.1
+gfn.Min([]int16{1, 5, 9, 10}...)  // 1
+```
+
+
+### gfn.MinBy
+```go
+func MinBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T 
+```
+MinBy returns the minimum value in the array, using the given function to transform values.
+
+#### Example:
+```go
+type Product struct {
+    name   string
+    amount int
+}
+products := []Product{
+    {"apple", 10},
+    {"banana", 20},
+    {"orange", 30},
+}
+p := gfn.MinBy(products, func(p Product) int {
+    return p.amount
+})  // {"apple", 10}
+```
+
+
+### gfn.MinFloat64
+```go
+func MinFloat64(array ...float64) float64 
+```
+MinFloat64 returns the minimum value in the array. NaN values are skipped.
+
+#### Example:
+```go
+gfn.MinFloat64(1, -1, 10)                                   // -1
+gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
+```
+
+
+### gfn.MinMax
+```go
+func MinMax[T Int | Uint | ~float32 | ~string](array ...T) (T, T) 
+```
+MinMax returns the minimum and maximum value in the array. For float64 arrays, please use MinMaxFloat64.
+
+#### Example:
+```go
+gfn.MinMax(1, 5, 9, 10)  // 1, 10
+```
+
+
+### gfn.MinMaxBy
+```go
+func MinMaxBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) (T, T) 
+```
+MinMaxBy returns the minimum and maximum value in the array, using the given function to transform values.
+
+#### Example:
+```go
+type Product struct {
+    name   string
+    amount int
+}
+products := []Product{
+    {"banana", 20},
+    {"orange", 30},
+    {"apple", 10},
+    {"grape", 50},
+    {"lemon", 40},
+}
+gfn.MinMaxBy(products, func(p Product) int {
+    return p.amount
+}) // {"apple", 10}, {"grape", 50}
+```
+
+
+### gfn.MinMaxFloat64
+```go
+func MinMaxFloat64(array ...float64) (float64, float64) 
+```
+MinMaxFloat64 returns the minimum and maximum value in the array. NaN values are skipped.
+
+#### Example:
+```go
+gfn.MinMaxFloat64(math.NaN(), 1.85, 2.2) // 1.85, 2.2
+gfn.MinMaxFloat64(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
+```
+
+
+### gfn.Mode
+```go
+func Mode[T comparable](array []T) T 
+```
+Mode returns the most frequent value in the array.
+
+#### Example:
+```go
+gfn.Mode([]int{1, 1, 5, 5, 5, 2, 2})) // 5
+```
+
+
+### gfn.ModeBy
+```go
+func ModeBy[T any, U comparable](array []T, fn func(T) U) T 
+```
+ModeBy returns the most frequent value in the array, using the given function to transform values.
+
+#### Example:
+```go
+type Product struct {
+    name   string
+    amount int
+}
+products := []Product{
+    {"banana", 20},
+    {"banana", 20},
+    {"apple", 10},
+}
+gfn.ModeBy(products, func(p Product) int {
+    return p.amount
+}) // {"banana", 20}
+```
+
+
+### gfn.Sum
+```go
+func Sum[T Int | Uint | Float | ~string | Complex](array ...T) T 
+```
+Sum returns the sum of all values in the array. Be careful when using this function for float64 arrays with NaN and Inf values. Sum([math.NaN(), 0.5]) produces math.NaN(). Sum(math.Inf(1), math.Inf(-1)) produces math.NaN() too.
+
+#### Example:
+```go
+gfn.Sum([]int{1, 5, 9, 10}...)  // 25
+gfn.Sum(1.1, 2.2, 3.3)          // 6.6
+gfn.Sum("ab", "cd", "e")        // "abcde"
+```
+
+
+### gfn.SumBy
+```go
+func SumBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) U 
+```
+SumBy returns the sum of all values in the array after applying fn to each value.
+
+#### Example:
+```go
+type Product struct {
+    name   string
+    amount int
+}
+products := []Product{
+    {"apple", 10},
+    {"banana", 20},
+    {"orange", 30},
+}
+gfn.SumBy(products, func(p Product) int {
+    return p.amount
+}) // 60
+```
+
+
 
 
 ## Array
@@ -764,90 +1137,6 @@ gfn.Zip([]int{1, 2, 3}, []string{"a", "b", "c"})
 
 
 
-## Functional
-
-
-### gfn.Filter
-```go
-func Filter[T any](array []T, filter func(T) bool) []T 
-```
-Filter returns a new array containing elements of the original array that satisfy the provided function.
-
-#### Example:
-```go
-array := []int{1, 2, 3, 4, 5, 6}
-gfn.Filter(array, func(i int) bool { return i%2 == 0 })
-// []int{2, 4, 6}
-```
-
-
-### gfn.FilterKV
-```go
-func FilterKV[K comparable, V any](m map[K]V, fn func(K, V) bool) map[K]V 
-```
-FilterKV returns a new map containing elements of the original map that satisfy the provided function.
-
-#### Example:
-```go
-m := map[int]string{1: "a", 2: "b", 3: "c"}
-gfn.FilterKV(m, func(k int, v string) bool {
-    return k == 1 || v == "c"
-})
-// map[int]string{1: "a", 3: "c"}
-```
-
-
-### gfn.Map
-```go
-func Map[T any, R any](array []T, mapper func(T) R) []R 
-```
-Map returns a new array with the results of calling the mapper function on each element. No MapKV because I don't know what to return, an array or a map? Instead, please use ForEachKV.
-
-#### Example:
-```go
-gfn.Map([]int{1, 2, 3}, func(i int) string {
-    return strconv.Itoa(i)
-})
-// []string{"1", "2", "3"}
-
-gfn.Map([]int{1, 2, 3}, func(i int) string { return i+1 })
-// []int{2, 3, 4}
-```
-
-
-### gfn.Reduce
-```go
-func Reduce[T any, R any](array []T, init R, fn func(R, T) R) R 
-```
-Reduce executes a reducer function on each element of the array, resulting in a single output value.
-
-#### Example:
-```go
-gfn.Reduce([]int{1, 2, 3}, 0, func(a, b int) int {
-    return a + b
-})
-// 6
-```
-
-
-### gfn.ReduceKV
-```go
-func ReduceKV[K comparable, V any, R any](m map[K]V, init R, fn func(R, K, V) R) R 
-```
-ReduceKV executes a reducer function on each element of the map, resulting in a single output value.
-
-#### Example:
-```go
-m := map[string]int{"a": 1, "b": 2, "c": 3}
-total := gfn.ReduceKV(m, 0, func(value int, k string, v int) int {
-    return value + v
-})
-// 6
-```
-
-
-
-
 ## Map
 
 
@@ -1137,205 +1426,28 @@ gfn.Values(map[int]string{1: "a", 2: "b", 3: "c"})
 
 
 
-## Math
 
+## Contributing
 
-### gfn.Abs
+Format:
 ```go
-func Abs[T Int | Float](x T) T 
-```
-Abs returns the absolute value of x.
+/* @example MyFunc
+// your examples here
+MyFunc(...)
+// output: ...
+*/
 
-#### Example:
-```go
-gfn.Abs(-1)      // 1
-gfn.Abs(-100.99) // 100.99
-```
-
-
-### gfn.DivMod
-```go
-func DivMod[T Int | Uint](a, b T) (T, T) 
-```
-DivMod returns quotient and remainder of a/b.
-
-#### Example:
-```go
-gfn.DivMod(10, 3) // (3, 1)
-```
-
-
-### gfn.Max
-```go
-func Max[T Int | Uint | ~float32 | ~string](array ...T) T 
-```
-Max returns the maximum value in the array. For float64 arrays, please use MaxFloat64. NaN value in float64 arrays is not comparable to other values. Which means Max([math.NaN(), 0.5]) produces math.NaN(), but Max([0.5, math.NaN()]) produces 0.5. Since arrays with same elements but different order produce different results (inconsistent), this function does not support float64 arrays.
-
-#### Example:
-```go
-gfn.Max([]int16{1, 5, 9, 10}...)  // 10
-gfn.Max("ab", "cd", "e")          // "e"
-```
-
-
-### gfn.MaxBy
-```go
-func MaxBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T 
-```
-MaxBy returns the maximum value in the array, using the given function to transform values.
-
-#### Example:
-```go
-type Product struct {
-    name   string
-    amount int
+// MyFunc is ...
+func MyFunc(args ...) (return values...) {
+    // your code here.
 }
-products := []Product{
-    {"apple", 10},
-    {"banana", 20},
-    {"orange", 30},
-}
-p := gfn.MaxBy(products, func(p Product) int {
-    return p.amount
-})  // {"orange", 30}
 ```
 
+then run following command to update `README.md` (generated from `README.tmpl.md`).
 
-### gfn.MaxFloat64
-```go
-func MaxFloat64(array ...float64) float64 
-```
-MaxFloat64 returns the maximum value in the array. NaN values are skipped.
-
-#### Example:
-```go
-gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
-gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
+```bash
+make doc
 ```
 
-
-### gfn.Mean
-```go
-func Mean[T Int | Uint | Float](array ...T) float64 
-```
-Mean returns the mean of all values in the array.
-
-#### Example:
-```go
-gfn.Mean(1, 2, 3)               // 2.0
-gfn.Mean([]int{1, 2, 3, 4}...)  // 2.5
-```
-
-
-### gfn.MeanBy
-```go
-func MeanBy[T any, U Int | Uint | Float](array []T, fn func(T) U) float64 
-```
-MeanBy returns the mean of all values in the array after applying fn to each value.
-
-#### Example:
-```go
-type Product struct {
-    name string
-    cost float64
-}
-products := []Product{
-    {"apple", 1.5},
-    {"banana", 2.5},
-    {"orange", 3.5},
-    {"lemon", 4.5},
-}
-gfn.MeanBy(products, func(p Product) float64 {
-    return p.cost
-})  // 3.0
-```
-
-
-### gfn.Min
-```go
-func Min[T Int | Uint | ~float32 | ~string](array ...T) T 
-```
-Min returns the minimum value in the array. For float64 arrays, please use MinFloat64. More details in Max.
-
-#### Example:
-```go
-gfn.Min(1.1, 2.2, 3.3)            // 1.1
-gfn.Min([]int16{1, 5, 9, 10}...)  // 1
-```
-
-
-### gfn.MinBy
-```go
-func MinBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T 
-```
-MinBy returns the maximum value in the array, using the given function to transform values.
-
-#### Example:
-```go
-type Product struct {
-    name   string
-    amount int
-}
-products := []Product{
-    {"apple", 10},
-    {"banana", 20},
-    {"orange", 30},
-}
-p := gfn.MinBy(products, func(p Product) int {
-    return p.amount
-})  // {"apple", 10}
-```
-
-
-### gfn.MinFloat64
-```go
-func MinFloat64(array ...float64) float64 
-```
-MinFloat64 returns the minimum value in the array. NaN values are skipped.
-
-#### Example:
-```go
-gfn.MinFloat64(1, -1, 10)                                   // -1
-gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
-```
-
-
-### gfn.Sum
-```go
-func Sum[T Int | Uint | Float | ~string | Complex](array ...T) T 
-```
-Sum returns the sum of all values in the array. Be careful when using this function for float64 arrays with NaN and Inf values. Sum([math.NaN(), 0.5]) produces math.NaN(). Sum(math.Inf(1), math.Inf(-1)) produces math.NaN() too.
-
-#### Example:
-```go
-gfn.Sum([]int{1, 5, 9, 10}...)  // 25
-gfn.Sum(1.1, 2.2, 3.3)          // 6.6
-gfn.Sum("ab", "cd", "e")        // "abcde"
-```
-
-
-### gfn.SumBy
-```go
-func SumBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) U 
-```
-SumBy returns the sum of all values in the array after applying fn to each value.
-
-#### Example:
-```go
-type Product struct {
-    name   string
-    amount int
-}
-products := []Product{
-    {"apple", 10},
-    {"banana", 20},
-    {"orange", 30},
-}
-gfn.SumBy(products, func(p Product) int {
-    return p.amount
-}) // 60
-```
-
-
-
-
+## License
+`gfn` is under the MIT license. See the [LICENSE](https://github.com/suchen-sci/gfn/blob/main/LICENSE) file for details.
