@@ -35,6 +35,13 @@ func TestMax(t *testing.T) {
 	type MyInt int
 	AssertEqual(t, MyInt(3), Max([]MyInt{1, 2, 3}...), "MyInt")
 
+	AssertEqual(t, 2.2, Max(math.NaN(), 1, 2.2))
+	AssertEqual(t, 2.8, Max(1, -1, math.NaN(), 1, 2.8))
+	AssertEqual(t, math.Inf(1), Max(1, -1, math.NaN(), 1, math.Inf(1)))
+	AssertEqual(t, math.Inf(1), Max(1, -1, 1, math.Inf(1)))
+	AssertEqual(t, 1.9, Max(1.9, -1., 1.))
+	AssertTrue(t, math.IsNaN(Max(math.NaN(), math.NaN(), math.NaN())))
+
 	// check empty array
 	AssertPanics(t, func() {
 		Max([]int{}...)
@@ -104,6 +111,14 @@ func TestMin(t *testing.T) {
 	// check ~int
 	type MyInt int
 	AssertEqual(t, MyInt(1), Min([]MyInt{1, 2, 3}...), "MyInt")
+
+	// float64 with NaN
+	AssertEqual(t, 1.85, Min(math.NaN(), 1.85, 2.2))
+	AssertEqual(t, -1, Min(1, -1, math.NaN(), 1, 2.8))
+	AssertEqual(t, math.Inf(-1), Min(1, -1, math.NaN(), 1, math.Inf(-1)))
+	AssertEqual(t, -1, Min(1, -1, 1, math.Inf(1)))
+	AssertEqual(t, -1, Min(1.9, -1., 1.))
+	AssertTrue(t, math.IsNaN(Min(math.NaN(), math.NaN(), math.NaN())))
 
 	// check empty array
 	AssertPanics(t, func() {
@@ -377,6 +392,30 @@ func TestMinMax(t *testing.T) {
 		minVal, maxVal := MinMax(array...)
 		AssertEqual(t, 99999, maxVal)
 		AssertEqual(t, 0, minVal)
+	}
+
+	// check float64 with NaN values
+	{
+		var minVal, maxVal float64
+		minVal, maxVal = MinMax(math.NaN(), 1.85, 2.2)
+		AssertEqual(t, 1.85, minVal)
+		AssertEqual(t, 2.2, maxVal)
+
+		minVal, maxVal = MinMax(1, -1, math.NaN(), 1, 2.8)
+		AssertEqual(t, -1, minVal)
+		AssertEqual(t, 2.8, maxVal)
+
+		minVal, maxVal = MinMax(1, -1, math.NaN(), 1, math.Inf(-1))
+		AssertEqual(t, math.Inf(-1), minVal)
+		AssertEqual(t, 1, maxVal)
+
+		minVal, maxVal = MinMax(1, -1, 1, math.Inf(1))
+		AssertEqual(t, -1, minVal)
+		AssertEqual(t, math.Inf(1), maxVal)
+
+		minVal, maxVal = MinMax(math.NaN(), math.NaN(), math.NaN())
+		AssertTrue(t, math.IsNaN(minVal))
+		AssertTrue(t, math.IsNaN(maxVal))
 	}
 }
 

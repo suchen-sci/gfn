@@ -1,31 +1,35 @@
 package gfn
 
-import (
-	"math"
-)
-
 /* @example Max
 gfn.Max([]int16{1, 5, 9, 10}...)  // 10
 gfn.Max("ab", "cd", "e")          // "e"
+
+gfn.Max(1.1, math.NaN(), 2.2)                             // 2.2
+gfn.Max([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
 */
 
-// Max returns the maximum value in the array. For float64 arrays, please use MaxFloat64.
-// NaN value in float64 arrays is not comparable to other values.
-// Which means Max([math.NaN(), 0.5]) produces math.NaN(), but Max([0.5, math.NaN()]) produces 0.5.
-// Since arrays with same elements but different order produce different results (inconsistent),
-// this function does not support float64 arrays.
-func Max[T Int | Uint | ~float32 | ~string](array ...T) T {
+// Max returns the maximum value in the array. For float64 arrays, NaN values are skipped.
+func Max[T Int | Uint | Float | ~string](array ...T) T {
 	if len(array) == 0 {
 		panic("array is empty")
 	}
 
 	res := array[0]
 	for _, v := range array {
-		if v > res {
+		if isNaN(v) {
+			continue
+		}
+		if isNaN(res) || v > res {
 			res = v
 		}
 	}
 	return res
+}
+
+// isNaN reports whether input is an IEEE 754 "not-a-number" value.
+func isNaN[T Int | Uint | Float | ~string](x T) bool {
+	// IEEE 754 says that only NaNs satisfy x != x.
+	return x != x
 }
 
 /* @example MaxBy
@@ -66,39 +70,31 @@ gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
 gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
 */
 
-// MaxFloat64 returns the maximum value in the array. NaN values are skipped.
+// Deprecated: MaxFloat64 returns the maximum value in the array. Use Max instead.
 func MaxFloat64(array ...float64) float64 {
-	if len(array) == 0 {
-		panic("array is empty")
-	}
-
-	res := array[0]
-	for _, v := range array {
-		if math.IsNaN(v) {
-			continue
-		}
-		if math.IsNaN(res) || v > res {
-			res = v
-		}
-	}
-	return res
+	return Max(array...)
 }
 
 /* @example Min
 gfn.Min(1.1, 2.2, 3.3)            // 1.1
 gfn.Min([]int16{1, 5, 9, 10}...)  // 1
+
+gfn.Min(1, -1, 10)                                   // -1
+gfn.Min([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
 */
 
-// Min returns the minimum value in the array. For float64 arrays, please use MinFloat64.
-// More details in Max.
-func Min[T Int | Uint | ~float32 | ~string](array ...T) T {
+// Min returns the minimum value in the array. For float64 arrays, NaN values are skipped.
+func Min[T Int | Uint | Float | ~string](array ...T) T {
 	if len(array) == 0 {
 		panic("array is empty")
 	}
 
 	res := array[0]
 	for _, v := range array {
-		if v < res {
+		if isNaN(v) {
+			continue
+		}
+		if isNaN(res) || v < res {
 			res = v
 		}
 	}
@@ -110,22 +106,9 @@ gfn.MinFloat64(1, -1, 10)                                   // -1
 gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
 */
 
-// MinFloat64 returns the minimum value in the array. NaN values are skipped.
+// Deprecated: MinFloat64 returns the minimum value in the array. Use Min instead.
 func MinFloat64(array ...float64) float64 {
-	if len(array) == 0 {
-		panic("array is empty")
-	}
-
-	res := array[0]
-	for _, v := range array {
-		if math.IsNaN(v) {
-			continue
-		}
-		if math.IsNaN(res) || v < res {
-			res = v
-		}
-	}
-	return res
+	return Min(array...)
 }
 
 /* @example MinBy
@@ -282,10 +265,13 @@ func MeanBy[T any, U Int | Uint | Float](array []T, fn func(T) U) float64 {
 
 /* @example MinMax
 gfn.MinMax(1, 5, 9, 10)  // 1, 10
+
+gfn.MinMax(math.NaN(), 1.85, 2.2) // 1.85, 2.2
+gfn.MinMax(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
 */
 
 // MinMax returns the minimum and maximum value in the array. For float64 arrays, please use MinMaxFloat64.
-func MinMax[T Int | Uint | ~float32 | ~string](array ...T) (T, T) {
+func MinMax[T Int | Uint | Float | ~string](array ...T) (T, T) {
 	if len(array) == 0 {
 		panic("array is empty")
 	}
@@ -293,10 +279,13 @@ func MinMax[T Int | Uint | ~float32 | ~string](array ...T) (T, T) {
 	minimum := array[0]
 	maximum := array[0]
 	for _, v := range array {
-		if v < minimum {
+		if isNaN(v) {
+			continue
+		}
+		if isNaN(minimum) || v < minimum {
 			minimum = v
 		}
-		if v > maximum {
+		if isNaN(maximum) || v > maximum {
 			maximum = v
 		}
 	}
@@ -308,26 +297,9 @@ gfn.MinMaxFloat64(math.NaN(), 1.85, 2.2) // 1.85, 2.2
 gfn.MinMaxFloat64(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
 */
 
-// MinMaxFloat64 returns the minimum and maximum value in the array. NaN values are skipped.
+// Deprecated: MinMaxFloat64 returns the minimum and maximum value in the array. Use MinMax instead.
 func MinMaxFloat64(array ...float64) (float64, float64) {
-	if len(array) == 0 {
-		panic("array is empty")
-	}
-
-	minimum := array[0]
-	maximum := array[0]
-	for _, v := range array {
-		if math.IsNaN(v) {
-			continue
-		}
-		if math.IsNaN(minimum) || v < minimum {
-			minimum = v
-		}
-		if math.IsNaN(maximum) || v > maximum {
-			maximum = v
-		}
-	}
-	return minimum, maximum
+	return MinMax(array...)
 }
 
 /* @example MinMaxBy

@@ -32,15 +32,15 @@
   - [gfn.DivMod](#gfndivmod)
   - [gfn.Max](#gfnmax)
   - [gfn.MaxBy](#gfnmaxby)
-  - [gfn.MaxFloat64](#gfnmaxfloat64)
+  - [gfn.MaxFloat64 (Deprecated)](#gfnmaxfloat64-deprecated)
   - [gfn.Mean](#gfnmean)
   - [gfn.MeanBy](#gfnmeanby)
   - [gfn.Min](#gfnmin)
   - [gfn.MinBy](#gfnminby)
-  - [gfn.MinFloat64](#gfnminfloat64)
+  - [gfn.MinFloat64 (Deprecated)](#gfnminfloat64-deprecated)
   - [gfn.MinMax](#gfnminmax)
   - [gfn.MinMaxBy](#gfnminmaxby)
-  - [gfn.MinMaxFloat64](#gfnminmaxfloat64)
+  - [gfn.MinMaxFloat64 (Deprecated)](#gfnminmaxfloat64-deprecated)
   - [gfn.Mode](#gfnmode)
   - [gfn.ModeBy](#gfnmodeby)
   - [gfn.Sum](#gfnsum)
@@ -270,14 +270,17 @@ gfn.DivMod(10, 3) // (3, 1)
 
 ### gfn.Max
 ```go
-func Max[T Int | Uint | ~float32 | ~string](array ...T) T 
+func Max[T Int | Uint | Float | ~string](array ...T) T 
 ```
-Max returns the maximum value in the array. For float64 arrays, please use MaxFloat64. NaN value in float64 arrays is not comparable to other values. Which means Max([math.NaN(), 0.5]) produces math.NaN(), but Max([0.5, math.NaN()]) produces 0.5. Since arrays with same elements but different order produce different results (inconsistent), this function does not support float64 arrays.
+Max returns the maximum value in the array. For float64 arrays, NaN values are skipped.
 
 #### Example:
 ```go
 gfn.Max([]int16{1, 5, 9, 10}...)  // 10
 gfn.Max("ab", "cd", "e")          // "e"
+
+gfn.Max(1.1, math.NaN(), 2.2)                             // 2.2
+gfn.Max([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
 ```
 [back to top](#gfn)
 
@@ -306,11 +309,11 @@ p := gfn.MaxBy(products, func(p Product) int {
 [back to top](#gfn)
 
 
-### gfn.MaxFloat64
+### gfn.MaxFloat64 (Deprecated)
 ```go
 func MaxFloat64(array ...float64) float64 
 ```
-MaxFloat64 returns the maximum value in the array. NaN values are skipped.
+Deprecated: MaxFloat64 returns the maximum value in the array. Use Max instead.
 
 #### Example:
 ```go
@@ -361,14 +364,17 @@ gfn.MeanBy(products, func(p Product) float64 {
 
 ### gfn.Min
 ```go
-func Min[T Int | Uint | ~float32 | ~string](array ...T) T 
+func Min[T Int | Uint | Float | ~string](array ...T) T 
 ```
-Min returns the minimum value in the array. For float64 arrays, please use MinFloat64. More details in Max.
+Min returns the minimum value in the array. For float64 arrays, NaN values are skipped.
 
 #### Example:
 ```go
 gfn.Min(1.1, 2.2, 3.3)            // 1.1
 gfn.Min([]int16{1, 5, 9, 10}...)  // 1
+
+gfn.Min(1, -1, 10)                                   // -1
+gfn.Min([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
 ```
 [back to top](#gfn)
 
@@ -397,11 +403,11 @@ p := gfn.MinBy(products, func(p Product) int {
 [back to top](#gfn)
 
 
-### gfn.MinFloat64
+### gfn.MinFloat64 (Deprecated)
 ```go
 func MinFloat64(array ...float64) float64 
 ```
-MinFloat64 returns the minimum value in the array. NaN values are skipped.
+Deprecated: MinFloat64 returns the minimum value in the array. Use Min instead.
 
 #### Example:
 ```go
@@ -413,13 +419,16 @@ gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
 
 ### gfn.MinMax
 ```go
-func MinMax[T Int | Uint | ~float32 | ~string](array ...T) (T, T) 
+func MinMax[T Int | Uint | Float | ~string](array ...T) (T, T) 
 ```
 MinMax returns the minimum and maximum value in the array. For float64 arrays, please use MinMaxFloat64.
 
 #### Example:
 ```go
 gfn.MinMax(1, 5, 9, 10)  // 1, 10
+
+gfn.MinMax(math.NaN(), 1.85, 2.2) // 1.85, 2.2
+gfn.MinMax(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
 ```
 [back to top](#gfn)
 
@@ -450,11 +459,11 @@ gfn.MinMaxBy(products, func(p Product) int {
 [back to top](#gfn)
 
 
-### gfn.MinMaxFloat64
+### gfn.MinMaxFloat64 (Deprecated)
 ```go
 func MinMaxFloat64(array ...float64) (float64, float64) 
 ```
-MinMaxFloat64 returns the minimum and maximum value in the array. NaN values are skipped.
+Deprecated: MinMaxFloat64 returns the minimum and maximum value in the array. Use MinMax instead.
 
 #### Example:
 ```go
