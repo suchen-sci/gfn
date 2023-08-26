@@ -24,6 +24,15 @@ func F1(a int) int {
 func skipFn(a int) int {
 	return a
 }
+
+/* @example F2
+this is multiline comments for F2.
+*/
+
+// Deprecated: F2 is f2.
+func F2(a int) int {
+	return a
+}
 `
 	dir, err := os.MkdirTemp("", "test-generate")
 	if err != nil {
@@ -43,6 +52,7 @@ func skipFn(a int) int {
 
 	toc := `- [Test](#test)
   - [gfn.F1](#gfnf1)
+  - [gfn.F2 (Deprecated)](#gfnf2-deprecated)
 `
 	if cat.toc() != toc {
 		t.Fatalf("toc not match, expect: %s, got: %s", toc, cat.toc())
@@ -60,6 +70,19 @@ F1 is f1.
 #### Example:
 ;;;go
 this is multiline comments for F1.
+;;;
+[back to top](#gfn)
+
+
+### gfn.F2 (Deprecated)
+;;;go
+func F2(a int) int 
+;;;
+Deprecated: F2 is f2.
+
+#### Example:
+;;;go
+this is multiline comments for F2.
 ;;;
 [back to top](#gfn)
 `

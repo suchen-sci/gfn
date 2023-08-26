@@ -49,7 +49,7 @@ func main() {
 
 const tocTemplate = `
 - [{{ .Name }}](#{{ .Name | toLower }})
-{{ range .Fns }}  - [gfn.{{ .Name }}](#gfn{{ .Name | toLower }})
+{{ range .Fns }}  - [gfn.{{ .Title }}](#gfn{{ .TOC | toLower }})
 {{ end }}
 `
 
@@ -57,7 +57,7 @@ const contentTemplate = `
 ## {{ .Name }}
 {{ if .Fns }}
 {{ range .Fns }}
-### gfn.{{ .Name }}
+### gfn.{{ .Title }}
 ;;;go
 {{ .Signature }}
 ;;;
@@ -105,11 +105,26 @@ const (
 )
 
 type function struct {
-	Name      string
-	Signature string
-	Comment   string
-	Example   string
-	state     fnState
+	Name       string
+	Signature  string
+	Comment    string
+	Example    string
+	state      fnState
+	deprecated bool
+}
+
+func (f *function) Title() string {
+	if f.deprecated {
+		return f.Name + " (Deprecated)"
+	}
+	return f.Name
+}
+
+func (f *function) TOC() string {
+	if f.deprecated {
+		return f.Name + "-deprecated"
+	}
+	return f.Name
 }
 
 func (f *function) addComment(line string) {
@@ -117,8 +132,13 @@ func (f *function) addComment(line string) {
 		f.state = state_comment
 		line = strings.TrimPrefix(line, "//")
 		line = strings.TrimSpace(line)
-		words := strings.SplitN(line, " ", 2)
-		f.Name = words[0]
+		words := strings.SplitN(line, " ", 3)
+		if words[0] == "Deprecated:" {
+			f.deprecated = true
+			f.Name = words[1]
+		} else {
+			f.Name = words[0]
+		}
 		f.Comment = line
 
 	} else if f.state == state_comment {
