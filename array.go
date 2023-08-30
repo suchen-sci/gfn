@@ -1,4 +1,4 @@
-// gfn is a Golang library that leverages generics to provide various methods.
+// Package gfn is a Golang library that leverages generics to provide various methods.
 package gfn
 
 import "math/rand"

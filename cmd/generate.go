@@ -1,3 +1,4 @@
+// Package main is used to generate README.md
 package main
 
 import (
@@ -44,7 +45,10 @@ func main() {
 		panic(err)
 	}
 	readmeStr := strings.Replace(strings.Replace(string(readmeTmpl), "{{ TOC }}", toc, 1), "{{ CONTENT }}", content, 1)
-	os.WriteFile(filepath.Join(wd, readmeFile), []byte(readmeStr), 0644)
+	err = os.WriteFile(filepath.Join(wd, readmeFile), []byte(readmeStr), 0644)
+	if err != nil {
+		panic(err)
+	}
 }
 
 const tocTemplate = `
@@ -84,24 +88,28 @@ func (c *category) toc() string {
 		"toLower": strings.ToLower,
 	}
 	tmlp := template.Must(template.New("toc").Funcs(funcs).Parse(tocTemplate))
-	tmlp.Execute(&sb, c)
+	if err := tmlp.Execute(&sb, c); err != nil {
+		panic(err)
+	}
 	return strings.TrimSpace(sb.String()) + "\n"
 }
 
 func (c *category) content() string {
 	sb := strings.Builder{}
 	tmpl := template.Must(template.New("function").Parse(strings.ReplaceAll(contentTemplate, ";;;", "```")))
-	tmpl.Execute(&sb, c)
+	if err := tmpl.Execute(&sb, c); err != nil {
+		panic(err)
+	}
 	return sb.String()
 }
 
 type fnState int
 
 const (
-	state_start fnState = iota
-	state_comment
-	state_finish
-	state_abort
+	stateStart fnState = iota
+	stateComment
+	stateFinish
+	stateAbort
 )
 
 type function struct {
@@ -128,8 +136,8 @@ func (f *function) TOC() string {
 }
 
 func (f *function) addComment(line string) {
-	if f.state == state_start {
-		f.state = state_comment
+	if f.state == stateStart {
+		f.state = stateComment
 		line = strings.TrimPrefix(line, "//")
 		line = strings.TrimSpace(line)
 		words := strings.SplitN(line, " ", 3)
@@ -141,7 +149,7 @@ func (f *function) addComment(line string) {
 		}
 		f.Comment = line
 
-	} else if f.state == state_comment {
+	} else if f.state == stateComment {
 		line = strings.TrimPrefix(line, "//")
 		line = strings.TrimSpace(line)
 		f.Comment += " " + line
@@ -153,20 +161,20 @@ func (f *function) addSignature(line string) {
 	line = strings.TrimSpace(line)
 	nameFirstChar := string(strings.TrimPrefix(line, "func ")[0])
 	if nameFirstChar != strings.ToUpper(nameFirstChar) {
-		f.state = state_abort
+		f.state = stateAbort
 		return
 	}
 	line = strings.TrimRight(line, "{")
 	f.Signature = line
-	f.state = state_finish
+	f.state = stateFinish
 }
 
 func (f *function) finish() bool {
-	return f.state == state_finish
+	return f.state == stateFinish
 }
 
 func (f *function) abort() bool {
-	return f.state == state_abort
+	return f.state == stateAbort
 }
 
 func processCategory(name, filePath string) (*category, error) {
