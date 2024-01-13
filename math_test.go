@@ -60,32 +60,6 @@ func TestMax(t *testing.T) {
 	}
 }
 
-func TestMaxFloat64(t *testing.T) {
-	AssertEqual(t, 2.2, MaxFloat64(math.NaN(), 1, 2.2))
-	AssertEqual(t, 2.8, MaxFloat64(1, -1, math.NaN(), 1, 2.8))
-	AssertEqual(t, math.Inf(1), MaxFloat64(1, -1, math.NaN(), 1, math.Inf(1)))
-	AssertEqual(t, math.Inf(1), MaxFloat64(1, -1, 1, math.Inf(1)))
-	AssertEqual(t, 1.9, MaxFloat64(1.9, -1, 1))
-	AssertTrue(t, math.IsNaN(MaxFloat64(math.NaN(), math.NaN(), math.NaN())))
-
-	// check empty array
-	AssertPanics(t, func() {
-		MaxFloat64()
-	})
-
-	// check array with many elements
-	{
-		array := make([]float64, 100000)
-		for i := 0; i < 100000; i++ {
-			array[i] = float64(i)
-		}
-		rand.Shuffle(len(array), func(i, j int) {
-			array[i], array[j] = array[j], array[i]
-		})
-		AssertEqual(t, float64(99999), MaxFloat64(array...))
-	}
-}
-
 func TestMin(t *testing.T) {
 	// ints
 	AssertEqual(t, 1, Min(1, 2, 3), "int")
@@ -135,32 +109,6 @@ func TestMin(t *testing.T) {
 			array[i], array[j] = array[j], array[i]
 		})
 		AssertEqual(t, 0, Min(array...))
-	}
-}
-
-func TestMinFloat64(t *testing.T) {
-	AssertEqual(t, 1.85, MinFloat64(math.NaN(), 1.85, 2.2))
-	AssertEqual(t, -1, MinFloat64(1, -1, math.NaN(), 1, 2.8))
-	AssertEqual(t, math.Inf(-1), MinFloat64(1, -1, math.NaN(), 1, math.Inf(-1)))
-	AssertEqual(t, -1, MinFloat64(1, -1, 1, math.Inf(1)))
-	AssertEqual(t, -1, MinFloat64(1.9, -1, 1))
-	AssertTrue(t, math.IsNaN(MinFloat64(math.NaN(), math.NaN(), math.NaN())))
-
-	// check empty array
-	AssertPanics(t, func() {
-		MinFloat64()
-	})
-
-	// check array with many elements
-	{
-		array := make([]float64, 100000)
-		for i := 0; i < 100000; i++ {
-			array[i] = float64(i)
-		}
-		rand.Shuffle(len(array), func(i, j int) {
-			array[i], array[j] = array[j], array[i]
-		})
-		AssertEqual(t, float64(0), MinFloat64(array...))
 	}
 }
 
@@ -416,48 +364,6 @@ func TestMinMax(t *testing.T) {
 		minVal, maxVal = MinMax(math.NaN(), math.NaN(), math.NaN())
 		AssertTrue(t, math.IsNaN(minVal))
 		AssertTrue(t, math.IsNaN(maxVal))
-	}
-}
-
-func TestMinMaxFloat64(t *testing.T) {
-	var minVal, maxVal float64
-	minVal, maxVal = MinMaxFloat64(math.NaN(), 1.85, 2.2)
-	AssertEqual(t, 1.85, minVal)
-	AssertEqual(t, 2.2, maxVal)
-
-	minVal, maxVal = MinMaxFloat64(1, -1, math.NaN(), 1, 2.8)
-	AssertEqual(t, -1, minVal)
-	AssertEqual(t, 2.8, maxVal)
-
-	minVal, maxVal = MinMaxFloat64(1, -1, math.NaN(), 1, math.Inf(-1))
-	AssertEqual(t, math.Inf(-1), minVal)
-	AssertEqual(t, 1, maxVal)
-
-	minVal, maxVal = MinMaxFloat64(1, -1, 1, math.Inf(1))
-	AssertEqual(t, -1, minVal)
-	AssertEqual(t, math.Inf(1), maxVal)
-
-	minVal, maxVal = MinMaxFloat64(math.NaN(), math.NaN(), math.NaN())
-	AssertTrue(t, math.IsNaN(minVal))
-	AssertTrue(t, math.IsNaN(maxVal))
-
-	// check empty array
-	AssertPanics(t, func() {
-		MinMaxFloat64()
-	})
-
-	// check array with many elements
-	{
-		array := make([]float64, 100000)
-		for i := 0; i < 100000; i++ {
-			array[i] = float64(i)
-		}
-		rand.Shuffle(len(array), func(i, j int) {
-			array[i], array[j] = array[j], array[i]
-		})
-		minVal, maxVal := MinMaxFloat64(array...)
-		AssertEqual(t, float64(0), minVal)
-		AssertEqual(t, float64(99999), maxVal)
 	}
 }
 

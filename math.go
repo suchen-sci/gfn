@@ -65,16 +65,6 @@ func MaxBy[T any, U Int | Uint | Float | ~string](array []T, fn func(T) U) T {
 	return res
 }
 
-/* @example MaxFloat64
-gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
-gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
-*/
-
-// Deprecated: MaxFloat64 returns the maximum value in the array. Use Max instead.
-func MaxFloat64(array ...float64) float64 {
-	return Max(array...)
-}
-
 /* @example Min
 gfn.Min(1.1, 2.2, 3.3)            // 1.1
 gfn.Min([]int16{1, 5, 9, 10}...)  // 1
@@ -99,16 +89,6 @@ func Min[T Int | Uint | Float | ~string](array ...T) T {
 		}
 	}
 	return res
-}
-
-/* @example MinFloat64
-gfn.MinFloat64(1, -1, 10)                                   // -1
-gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
-*/
-
-// Deprecated: MinFloat64 returns the minimum value in the array. Use Min instead.
-func MinFloat64(array ...float64) float64 {
-	return Min(array...)
 }
 
 /* @example MinBy
@@ -290,16 +270,6 @@ func MinMax[T Int | Uint | Float | ~string](array ...T) (T, T) {
 		}
 	}
 	return minimum, maximum
-}
-
-/* @example MinMaxFloat64
-gfn.MinMaxFloat64(math.NaN(), 1.85, 2.2) // 1.85, 2.2
-gfn.MinMaxFloat64(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
-*/
-
-// Deprecated: MinMaxFloat64 returns the minimum and maximum value in the array. Use MinMax instead.
-func MinMaxFloat64(array ...float64) (float64, float64) {
-	return MinMax(array...)
 }
 
 /* @example MinMaxBy

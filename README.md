@@ -32,15 +32,12 @@
   - [gfn.DivMod](#gfndivmod)
   - [gfn.Max](#gfnmax)
   - [gfn.MaxBy](#gfnmaxby)
-  - [gfn.MaxFloat64 (Deprecated)](#gfnmaxfloat64-deprecated)
   - [gfn.Mean](#gfnmean)
   - [gfn.MeanBy](#gfnmeanby)
   - [gfn.Min](#gfnmin)
   - [gfn.MinBy](#gfnminby)
-  - [gfn.MinFloat64 (Deprecated)](#gfnminfloat64-deprecated)
   - [gfn.MinMax](#gfnminmax)
   - [gfn.MinMaxBy](#gfnminmaxby)
-  - [gfn.MinMaxFloat64 (Deprecated)](#gfnminmaxfloat64-deprecated)
   - [gfn.Mode](#gfnmode)
   - [gfn.ModeBy](#gfnmodeby)
   - [gfn.Sum](#gfnsum)
@@ -309,20 +306,6 @@ p := gfn.MaxBy(products, func(p Product) int {
 [back to top](#gfn)
 
 
-### gfn.MaxFloat64 (Deprecated)
-```go
-func MaxFloat64(array ...float64) float64 
-```
-Deprecated: MaxFloat64 returns the maximum value in the array. Use Max instead.
-
-#### Example:
-```go
-gfn.MaxFloat64(1.1, math.NaN(), 2.2)                             // 2.2
-gfn.MaxFloat64([]float64{math.NaN(), math.NaN(), math.NaN()}...) // NaN
-```
-[back to top](#gfn)
-
-
 ### gfn.Mean
 ```go
 func Mean[T Int | Uint | Float](array ...T) float64 
@@ -403,20 +386,6 @@ p := gfn.MinBy(products, func(p Product) int {
 [back to top](#gfn)
 
 
-### gfn.MinFloat64 (Deprecated)
-```go
-func MinFloat64(array ...float64) float64 
-```
-Deprecated: MinFloat64 returns the minimum value in the array. Use Min instead.
-
-#### Example:
-```go
-gfn.MinFloat64(1, -1, 10)                                   // -1
-gfn.MinFloat64([]float64{1.1, math.Inf(-1), math.NaN()}...) // math.Inf(-1)
-```
-[back to top](#gfn)
-
-
 ### gfn.MinMax
 ```go
 func MinMax[T Int | Uint | Float | ~string](array ...T) (T, T) 
@@ -455,20 +424,6 @@ products := []Product{
 gfn.MinMaxBy(products, func(p Product) int {
     return p.amount
 }) // {"apple", 10}, {"grape", 50}
-```
-[back to top](#gfn)
-
-
-### gfn.MinMaxFloat64 (Deprecated)
-```go
-func MinMaxFloat64(array ...float64) (float64, float64) 
-```
-Deprecated: MinMaxFloat64 returns the minimum and maximum value in the array. Use MinMax instead.
-
-#### Example:
-```go
-gfn.MinMaxFloat64(math.NaN(), 1.85, 2.2) // 1.85, 2.2
-gfn.MinMaxFloat64(math.NaN(), math.NaN(), math.NaN()) // NaN, NaN
 ```
 [back to top](#gfn)
 
